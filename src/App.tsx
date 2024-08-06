@@ -1,6 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
-import "./App.css";
 import reactLogo from "./assets/react.svg";
 
 function App() {
@@ -19,7 +18,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Welcome to Tauri!</h1>
+      <h1 className="text-4xl text-red-700">Welcome to Tauri!</h1>
 
       <div className="row">
         <a href="https://vitejs.dev" target="_blank">
@@ -32,22 +31,6 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      {/* 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          getVolume();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setProcess(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Get Volume</button>
-        <p>{volume}</p>
-      </form> */}
     </div>
   );
 }
