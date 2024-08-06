@@ -9,8 +9,8 @@ use windows::Win32::System::ProcessStatus::*;
 use windows::Win32::System::Threading::*;
 
 #[tauri::command]
-fn get_process_volume(process_name: &str) -> Result<f32, String> {
-    println!("Getting volume for process: {}", process_name);
+fn get_process_volume(process_name: &str) -> Result<u32, String> {
+    println!("Get {} volume", process_name);
 
     // If process name doesn't end in .exe, append it
     let process_name = if !process_name.ends_with(".exe") {
@@ -22,9 +22,10 @@ fn get_process_volume(process_name: &str) -> Result<f32, String> {
     let sessions = enumerate_audio_sessions().map_err(|e| e.to_string())?;
     for session in sessions {
         if let Ok(name) = get_process_name_from_session(&session) {
-            println!("Found process: {}", name);
             if name.to_lowercase() == process_name.to_lowercase() {
-                return get_volume_from_session(&session).map_err(|e| e.to_string());
+                let volume: Result<u32, String> = get_volume_from_session(&session).map_err(|e| e.to_string());
+                println!("Volume: {:?}", volume);
+                return volume;
             }
         }
     }
@@ -32,13 +33,19 @@ fn get_process_volume(process_name: &str) -> Result<f32, String> {
 }
 
 #[tauri::command]
-fn set_process_volume(process_name: &str, volume: f32) -> Result<(), String> {
-    println!("Setting volume for process: {} to {}", process_name, volume);
+fn set_process_volume(process_name: &str, volume: u32) -> Result<u32, String> {
+    println!("Setting {} volume to {}", process_name, volume);
+
+    // If process name doesn't end in .exe, append it
+    let process_name = if !process_name.ends_with(".exe") {
+        format!("{}.exe", process_name)
+    } else {
+        process_name.to_string()
+    };
 
     let sessions = enumerate_audio_sessions().map_err(|e| e.to_string())?;
     for session in sessions {
         if let Ok(name) = get_process_name_from_session(&session) {
-            println!("Found process: {}", name);
             if name.to_lowercase() == process_name.to_lowercase() {
                 return set_volume_for_session(&session, volume).map_err(|e| e.to_string());
             }
@@ -49,9 +56,9 @@ fn set_process_volume(process_name: &str, volume: f32) -> Result<(), String> {
 
 fn enumerate_audio_sessions() -> windows::core::Result<Vec<IAudioSessionControl2>> {
     let enumerator: IAudioSessionEnumerator = unsafe {
-        let device_enumerator: IMMDeviceEnumerator =
-            CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL)?;
+        let device_enumerator: IMMDeviceEnumerator = CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL)?;
         let device = device_enumerator.GetDefaultAudioEndpoint(eRender, eMultimedia)?;
+
         let session_manager: IAudioSessionManager2 = device.Activate(CLSCTX_ALL, None)?;
         session_manager.GetSessionEnumerator()?
     };
@@ -67,8 +74,7 @@ fn enumerate_audio_sessions() -> windows::core::Result<Vec<IAudioSessionControl2
 
 fn get_process_name_from_session(session: &IAudioSessionControl2) -> windows::core::Result<String> {
     let pid = unsafe { session.GetProcessId()? };
-    let process_handle =
-        unsafe { OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid) }?;
+    let process_handle = unsafe { OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid) }?;
     if process_handle.is_invalid() {
         return Err(windows::core::Error::from_win32());
     }
@@ -88,25 +94,22 @@ fn get_process_name_from_session(session: &IAudioSessionControl2) -> windows::co
     Ok(String::from_utf16_lossy(&name[..len as usize]))
 }
 
-fn get_volume_from_session(session: &IAudioSessionControl2) -> windows::core::Result<f32> {
+fn get_volume_from_session(session: &IAudioSessionControl2) -> windows::core::Result<u32> {
     let simple_volume: ISimpleAudioVolume = session.cast()?;
-    unsafe { simple_volume.GetMasterVolume() }
+    let volume = unsafe { simple_volume.GetMasterVolume()? };
+    Ok((volume * 100.0).round() as u32)
 }
 
-fn set_volume_for_session(
-    session: &IAudioSessionControl2,
-    volume: f32,
-) -> windows::core::Result<()> {
+fn set_volume_for_session(session: &IAudioSessionControl2, volume: u32) -> windows::core::Result<u32> {
+    let float_volume: f32 = volume as f32 / 100.0;
     let simple_volume: ISimpleAudioVolume = session.cast()?;
-    unsafe { simple_volume.SetMasterVolume(volume, std::ptr::null()) }
+    unsafe { simple_volume.SetMasterVolume(float_volume, std::ptr::null())? }
+    Ok(volume)
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![
-            get_process_volume,
-            set_process_volume
-        ])
+        .invoke_handler(tauri::generate_handler![get_process_volume, set_process_volume])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

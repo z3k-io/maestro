@@ -1,36 +1,62 @@
+import { Slider } from "@/components/ui/slider";
 import { invoke } from "@tauri-apps/api/tauri";
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useEffect, useState } from "react";
 
 function App() {
   const [process, setProcess] = useState("chrome");
-  const [volume, setVolume] = useState("Unknown");
+  const [volume, setVolume] = useState(0);
+
+  // const [currentVolume, setCurrentVolume] = useState<number>(0);
+
+  // const [processes, setProcesses] = useState<string[]>([
+  //   "master",
+  //   "chrome",
+  //   "discord",
+  // ]);
+  // const [volumes, setVolumes] = useState<number[]>([20, 30, 50]);
+
+  useEffect(() => {
+    getVolume();
+  }, [process]);
 
   async function getVolume() {
     const processName = process;
-    console.log(processName);
     const volume = (await invoke("get_process_volume", {
       processName,
-    })) as string;
-    console.log(volume);
+    })) as number;
+    console.debug(`${processName} volume is ${volume}`);
     setVolume(volume);
   }
 
-  return (
-    <div className="container">
-      <h1 className="text-4xl text-red-700">Welcome to Tauri!</h1>
+  async function updateVolume(value: number[]) {
+    if (value[0] === volume) {
+      console.debug("Volume is the same, returning");
+      return;
+    }
 
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
+    let updatedVolume = value[0];
+    try {
+      await invoke("set_process_volume", {
+        processName: process,
+        volume: value[0],
+      });
+      setVolume(value[0]);
+    } catch (error) {
+      console.error("Error setting volume", error);
+    }
+
+    console.debug("New volume is", updatedVolume);
+  }
+
+  return (
+    <div className="container p-10">
+      <Slider
+        defaultValue={[33]}
+        max={100}
+        step={2}
+        value={[volume]}
+        onValueChange={updateVolume}
+      />
     </div>
   );
 }
