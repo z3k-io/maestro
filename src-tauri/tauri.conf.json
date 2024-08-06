@@ -20,6 +20,7 @@
     "windows": [
       {
         "title": "apollo",
+        "decorations": true,
         "width": 800,
         "height": 600
       }

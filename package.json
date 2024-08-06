@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "go": "tauri dev"
+    "start": "tauri dev"
   },
   "dependencies": {
     "react": "^18.2.0",

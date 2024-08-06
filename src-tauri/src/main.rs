@@ -8,19 +8,39 @@ use windows::Win32::System::Com::*;
 use windows::Win32::System::ProcessStatus::*;
 use windows::Win32::System::Threading::*;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 fn get_process_volume(process_name: &str) -> Result<f32, String> {
+    println!("Getting volume for process: {}", process_name);
+
+    // If process name doesn't end in .exe, append it
+    let process_name = if !process_name.ends_with(".exe") {
+        format!("{}.exe", process_name)
+    } else {
+        process_name.to_string()
+    };
+
     let sessions = enumerate_audio_sessions().map_err(|e| e.to_string())?;
     for session in sessions {
         if let Ok(name) = get_process_name_from_session(&session) {
-            if name == process_name {
+            println!("Found process: {}", name);
+            if name.to_lowercase() == process_name.to_lowercase() {
                 return get_volume_from_session(&session).map_err(|e| e.to_string());
+            }
+        }
+    }
+    Err("Process not found".into())
+}
+
+#[tauri::command]
+fn set_process_volume(process_name: &str, volume: f32) -> Result<(), String> {
+    println!("Setting volume for process: {} to {}", process_name, volume);
+
+    let sessions = enumerate_audio_sessions().map_err(|e| e.to_string())?;
+    for session in sessions {
+        if let Ok(name) = get_process_name_from_session(&session) {
+            println!("Found process: {}", name);
+            if name.to_lowercase() == process_name.to_lowercase() {
+                return set_volume_for_session(&session, volume).map_err(|e| e.to_string());
             }
         }
     }
@@ -73,9 +93,20 @@ fn get_volume_from_session(session: &IAudioSessionControl2) -> windows::core::Re
     unsafe { simple_volume.GetMasterVolume() }
 }
 
+fn set_volume_for_session(
+    session: &IAudioSessionControl2,
+    volume: f32,
+) -> windows::core::Result<()> {
+    let simple_volume: ISimpleAudioVolume = session.cast()?;
+    unsafe { simple_volume.SetMasterVolume(volume, std::ptr::null()) }
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_process_volume])
+        .invoke_handler(tauri::generate_handler![
+            get_process_volume,
+            set_process_volume
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

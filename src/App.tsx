@@ -4,18 +4,12 @@ import "./App.css";
 import reactLogo from "./assets/react.svg";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-  const [volume, setVolume] = useState("asdf");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const [process, setProcess] = useState("chrome");
+  const [volume, setVolume] = useState("Unknown");
 
   async function getVolume() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    const processName = "chrome.exe";
+    const processName = process;
+    console.log(processName);
     const volume = (await invoke("get_process_volume", {
       processName,
     })) as string;
@@ -38,27 +32,22 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-      <button onClick={getVolume}>Get Volume</button>
-      <p>{volume}</p>
-
+      {/* 
       <form
         className="row"
         onSubmit={(e) => {
           e.preventDefault();
-          greet();
+          getVolume();
         }}
       >
         <input
           id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
+          onChange={(e) => setProcess(e.currentTarget.value)}
           placeholder="Enter a name..."
         />
-        <button type="submit">Greet</button>
-      </form>
-
-      <p>{greetMsg}</p>
+        <button type="submit">Get Volume</button>
+        <p>{volume}</p>
+      </form> */}
     </div>
   );
 }
