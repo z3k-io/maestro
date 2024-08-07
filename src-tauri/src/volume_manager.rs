@@ -7,7 +7,7 @@ use windows::Win32::System::Threading::*;
 
 #[tauri::command]
 pub fn get_process_volume(process_name: &str) -> Result<u32, String> {
-    println!("Get {} volume", process_name);
+    print!("GET {} volume -> ", process_name);
 
     // If process name doesn't end in .exe, append it
     let process_name = if !process_name.ends_with(".exe") {
@@ -21,7 +21,7 @@ pub fn get_process_volume(process_name: &str) -> Result<u32, String> {
         if let Ok(name) = get_process_name_from_session(&session) {
             if name.to_lowercase() == process_name.to_lowercase() {
                 let volume: Result<u32, String> = get_volume_from_session(&session).map_err(|e| e.to_string());
-                println!("Volume: {}", volume.clone().unwrap());
+                println!("{}", volume.clone().unwrap());
                 return volume;
             }
         }
@@ -31,7 +31,7 @@ pub fn get_process_volume(process_name: &str) -> Result<u32, String> {
 
 #[tauri::command]
 pub fn set_process_volume(process_name: &str, volume: u32) -> Result<u32, String> {
-    println!("Setting {} volume -> {}", process_name, volume);
+    println!("SET {} volume -> {}", process_name, volume);
 
     // If process name doesn't end in .exe, append it
     let process_name = if !process_name.ends_with(".exe") {
