@@ -67,3 +67,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+  border-radius: 15px; /* Rounded corners */
+  overflow: hidden; /* Ensure no overflow */
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
