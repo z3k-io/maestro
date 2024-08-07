@@ -1,13 +1,13 @@
-import { Slider } from "@/components/ui/slider";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/tauri";
 import { appWindow } from "@tauri-apps/api/window";
 import { useEffect, useRef, useState } from "react";
+import SpeakerIcon from "./components/SpeakerIcon";
 
 appWindow.show();
 
 function App() {
-  const [process, setProcess] = useState("chrome");
+  const [process, _setProcess] = useState("chrome");
   const [volume, setVolume] = useState(0);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,12 +25,14 @@ function App() {
     setVolume(event.payload as number);
   });
 
+  // Todo: This isn't working
   function resetHideTimeout() {
     console.debug("Resetting hide timeout");
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
     }
     hideTimeoutRef.current = setTimeout(() => {
+      console.debug("Hiding window");
       appWindow.hide();
     }, 2000);
   }
@@ -62,14 +64,37 @@ function App() {
     console.debug("New volume is", newVolume);
   }
 
+  const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const volume = Number(event.target.value);
+    updateVolume(volume);
+  };
+
   return (
     <div
-      className="flex flex-row justify-center items-center h-screen p-4 bg-gray-700 bg-transparent"
+      className="flex flex-col h-screen w-screen bg-base-300 justify-center"
       onMouseDown={resetHideTimeout}
       onMouseMove={resetHideTimeout}
       onMouseUp={resetHideTimeout}
+      onMouseOver={resetHideTimeout}
     >
-      <Slider defaultValue={[33]} max={100} step={2} value={[volume]} onValueChange={(v) => updateVolume(v[0])} />
+      <h1 className="flex justify-center capitalize font-semibold text-md">{process}</h1>
+      <div className="flex flex-row items-center gap-2 px-4">
+        <button
+          className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-200 rounded-md"
+          onClick={() => updateVolume(0)}
+        >
+          <SpeakerIcon volume={volume} className="h-4 w-4" />
+        </button>
+        <input
+          type="range"
+          min={0}
+          max="100"
+          value={volume}
+          className="range range-xs range-primary"
+          onChange={handleSliderChange}
+        />
+        <h2 className="text-lg w-12 text-center">{volume}</h2>
+      </div>
     </div>
   );
 }
