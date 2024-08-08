@@ -1,0 +1,6 @@
+- Fix lag on serial read
+- Handle mute state
+- Handle 'other' option
+- Unify data format: 0-1 vs 0-100
+- Fix thread crash with media keys
+- Figure out ERROR: Couldn't get process information of process id X

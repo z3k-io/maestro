@@ -7,7 +7,7 @@ import SpeakerIcon from "./components/SpeakerIcon";
 appWindow.show();
 
 function App() {
-  const [process, _setProcess] = useState("chrome");
+  const [process, setProcess] = useState("master");
   const [volume, setVolume] = useState(0);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -19,13 +19,19 @@ function App() {
     getVolume();
   }, []);
 
-  listen("volume-change", (event) => {
-    console.debug("Volume changed: ", event.payload);
+  listen<String>("volume-change", (event) => {
+    console.debug(`Volume change event received: ${event}`);
+    // event.payload = <session>:<volume>
+    const sessionName = event.payload.split(":")[0];
+    const volume = Number(event.payload.split(":")[1]);
+
+    setProcess(sessionName);
+    setVolume(volume * 100);
+
     resetHideTimeout();
-    setVolume(event.payload as number);
   });
 
-  // Todo: This isn't working
+  // TODO: This isn't working
   function resetHideTimeout() {
     console.debug("Resetting hide timeout");
     if (hideTimeoutRef.current) {
@@ -34,11 +40,11 @@ function App() {
     hideTimeoutRef.current = setTimeout(() => {
       console.debug("Hiding window");
       appWindow.hide();
-    }, 2000);
+    }, 3000);
   }
 
   async function getVolume() {
-    const processName = "chrome";
+    const processName = process;
     const volume = (await invoke("get_process_volume", {
       processName,
     })) as number;
@@ -53,8 +59,8 @@ function App() {
     }
     setVolume(newVolume);
     try {
-      await invoke("set_process_volume", {
-        processName: process,
+      await invoke("set_session_volume", {
+        session_name: process,
         volume: newVolume,
       });
     } catch (error) {

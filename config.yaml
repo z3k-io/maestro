@@ -1,0 +1,10 @@
+# Arduio interface
+com_port: COM3
+baud_rate: 9600
+
+# Case insensitive process names, including file extensions
+# Special cases
+# - master: system volume of default audio device
+# - other: all active processes not otherwise listed
+inputs: [master, chrome, discord, other]
+
