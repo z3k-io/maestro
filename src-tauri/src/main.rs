@@ -75,6 +75,36 @@ fn read_continuous_serial(config: Config, window: Window) -> () {
     });
 }
 
+fn override_media_keys(window: &Window, handle: AppHandle) -> () {
+    let window_clone_for_up = window.clone();
+    let window_clone_for_down = window.clone();
+
+    handle
+        .global_shortcut_manager()
+        .register("VolumeUp", move || {
+            println!("KEYPRESS: VolumeUp");
+
+            let current_vol = volume_manager::get_session_volume("master");
+            let updated_vol = volume_manager::set_session_volume("master", current_vol + 0.02);
+
+            window_clone_for_up.show().unwrap();
+            window_clone_for_up.emit("volume-change", updated_vol).unwrap();
+        })
+        .unwrap();
+    handle
+        .global_shortcut_manager()
+        .register("VolumeDown", move || {
+            println!("KEYPRESS: VolumeDown");
+
+            let current_vol = volume_manager::get_session_volume("master");
+            let updated_vol = volume_manager::set_session_volume("master", current_vol - 0.02);
+
+            window_clone_for_down.show().unwrap();
+            window_clone_for_down.emit("volume-change", updated_vol).unwrap();
+        })
+        .unwrap();
+}
+
 fn main() {
     let config_path = "../config.yaml";
     let config = read_config(&config_path).expect("Failed to read config file");
@@ -84,38 +114,12 @@ fn main() {
 
     tauri::Builder::default()
         .setup(|app| {
-            let window = app.get_window("main").unwrap();
+            let window: Window = app.get_window("main").unwrap();
             let handle: AppHandle = app.handle();
 
             window_manager::center_window_at_top(&window);
 
-            let window_clone_for_up = window.clone();
-            let window_clone_for_down = window.clone();
-
-            handle
-                .global_shortcut_manager()
-                .register("VolumeUp", move || {
-                    println!("KEYPRESS: VolumeUp");
-
-                    let current_vol = volume_manager::get_session_volume("master");
-                    let updated_vol = volume_manager::set_session_volume("master", current_vol + 0.02);
-
-                    window_clone_for_up.show().unwrap();
-                    window_clone_for_up.emit("volume-change", updated_vol).unwrap();
-                })
-                .unwrap();
-            handle
-                .global_shortcut_manager()
-                .register("VolumeDown", move || {
-                    println!("KEYPRESS: VolumeDown");
-
-                    let current_vol = volume_manager::get_session_volume("master");
-                    let updated_vol = volume_manager::set_session_volume("master", current_vol - 0.02);
-
-                    window_clone_for_down.show().unwrap();
-                    window_clone_for_down.emit("volume-change", updated_vol).unwrap();
-                })
-                .unwrap();
+            // override_media_keys(&window, handle);
 
             read_continuous_serial(config, window);
 
