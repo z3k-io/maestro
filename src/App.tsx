@@ -20,12 +20,12 @@ function App() {
   }, []);
 
   listen<String>("volume-change", (event) => {
-    console.debug(`Volume change event received: ${event}`);
+    console.debug(`Volume change event received: ${event.payload}`);
     // event.payload = <session>:<volume>
-    const sessionName = event.payload.split(":")[0];
+    const processName = event.payload.split(":")[0];
     const volume = Number(event.payload.split(":")[1]);
 
-    setProcess(sessionName);
+    setProcess(processName);
     setVolume(Math.round(volume * 100));
 
     resetHideTimeout();
@@ -59,10 +59,7 @@ function App() {
     }
     setVolume(newVolume);
     try {
-      await invoke("set_session_volume", {
-        session_name: process,
-        volume: newVolume,
-      });
+      await invoke("set_session_volume", { sessionName: process, volume: newVolume / 100.0 });
     } catch (error) {
       console.error("Error setting volume", error);
     }

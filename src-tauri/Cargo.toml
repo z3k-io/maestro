@@ -18,6 +18,7 @@ winapi = { version = "^0.3.9", features = ["endpointvolume"] }
 windows-volume-control = "0.1.1"
 colored = "2.1.0"
 serialport = "4.0"
+inputbot = "0.6"
 
 
 [dependencies.tauri]

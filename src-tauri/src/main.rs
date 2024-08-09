@@ -7,14 +7,17 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
+use std::sync::Arc;
 use std::thread;
-use tauri::Config;
-use tauri::Window;
-
+use tauri::App;
 use tauri::AppHandle;
+use tauri::Config;
 use tauri::SystemTray;
 use tauri::SystemTrayMenu;
+use tauri::Window;
 use tauri::{GlobalShortcutManager, Manager};
+
+use inputbot::{KeySequence, KeybdKey::*, MouseButton::*};
 
 mod config;
 mod serial;
@@ -45,8 +48,6 @@ fn read_continuous_serial(window: Window) -> () {
 
                 current_volumes.insert(session_name.clone(), new_volume);
 
-                println!("Updaing {} volume: {} -> {}", session_name, current_volume, new_volume);
-
                 // TODO: Handle -1 = mute
                 // TODO: Handle session not currently found in the system (i.e. not open in Windows)
 
@@ -65,34 +66,33 @@ fn read_continuous_serial(window: Window) -> () {
     });
 }
 
-fn override_media_keys(window: &Window, handle: AppHandle) -> () {
-    let window_clone_for_up = window.clone();
-    let window_clone_for_down = window.clone();
+fn override_media_keys(window: Window) {
+    let window = Arc::new(window); // Wrap the window in Arc for shared ownership
 
-    handle
-        .global_shortcut_manager()
-        .register("VolumeUp", move || {
-            println!("KEYPRESS: VolumeUp");
+    let window_clone_for_up = Arc::clone(&window);
+    let window_clone_for_down = Arc::clone(&window);
 
-            let current_vol = volume_manager::get_session_volume("master");
-            let updated_vol = volume_manager::set_session_volume("master", current_vol + 0.02);
+    VolumeUpKey.block_bind(move || {
+        let current_vol = volume_manager::get_session_volume("master");
+        let updated_vol = volume_manager::set_session_volume("master", current_vol + 0.02);
 
-            window_clone_for_up.show().unwrap();
-            window_clone_for_up.emit("volume-change", updated_vol).unwrap();
-        })
-        .unwrap();
-    handle
-        .global_shortcut_manager()
-        .register("VolumeDown", move || {
-            println!("KEYPRESS: VolumeDown");
+        let payload = format!("{}:{}", "master", updated_vol);
+        window_clone_for_up.show().unwrap();
+        window_clone_for_up.emit("volume-change", payload).unwrap();
+    });
 
-            let current_vol = volume_manager::get_session_volume("master");
-            let updated_vol = volume_manager::set_session_volume("master", current_vol - 0.02);
+    VolumeDownKey.block_bind(move || {
+        let current_vol = volume_manager::get_session_volume("master");
+        let updated_vol = volume_manager::set_session_volume("master", current_vol - 0.02);
 
-            window_clone_for_down.show().unwrap();
-            window_clone_for_down.emit("volume-change", updated_vol).unwrap();
-        })
-        .unwrap();
+        let payload = format!("{}:{}", "master", updated_vol);
+        window_clone_for_down.show().unwrap();
+        window_clone_for_down.emit("volume-change", payload).unwrap();
+    });
+
+    thread::spawn(move || {
+        inputbot::handle_input_events();
+    });
 }
 
 fn main() {
@@ -102,13 +102,13 @@ fn main() {
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|app: &mut App| {
             let window: Window = app.get_window("main").unwrap();
             let handle: AppHandle = app.handle();
 
             window_manager::center_window_at_top(&window);
 
-            // override_media_keys(&window, handle);
+            override_media_keys(window.clone());
 
             read_continuous_serial(window);
 
@@ -117,6 +117,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             volume_manager::get_session_volume,
             volume_manager::set_session_volume,
+            volume_manager::master_volume_up,
+            volume_manager::master_volume_down,
             window_manager::apply_aero_theme,
         ])
         .system_tray(system_tray)
