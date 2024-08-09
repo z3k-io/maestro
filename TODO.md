@@ -2,4 +2,11 @@
 - Handle 'other' option
 - Unify data format: 0-1 vs 0-100
 - Syncing state between arduino and changes made by media keys or win system settings
--
+- App icons in UI
+- UI animation
+- Create tray menu
+  - Debug console
+  - Edit config UI
+  - Exit
+  - List com ports, switch
+  - Open file location / config, etc.

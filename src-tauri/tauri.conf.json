@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "apollo",
+    "productName": "mix-monkey",
     "version": "0.0.0"
   },
   "tauri": {
@@ -27,7 +27,7 @@
     },
     "windows": [
       {
-        "title": "apollo",
+        "title": "Mix Monkey",
         "visible": false,
         "decorations": false,
         "transparent": true,
