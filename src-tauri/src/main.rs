@@ -1,4 +1,5 @@
 // src/main.rs
+
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(warnings)]
 
@@ -7,69 +8,58 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::thread;
+use tauri::Config;
 use tauri::Window;
 
 use tauri::AppHandle;
 use tauri::SystemTray;
 use tauri::SystemTrayMenu;
 use tauri::{GlobalShortcutManager, Manager};
+
+mod config;
 mod serial;
 mod volume_manager;
 mod window_manager;
-#[derive(Debug, Deserialize)]
-struct Config {
-    com_port: String,
-    baud_rate: u32,
-    inputs: Vec<String>,
-}
 
-fn read_config(path: &str) -> Result<Config, Box<dyn std::error::Error>> {
-    let mut file = File::open(path)?;
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-
-    let config: Config = serde_yaml::from_str(&contents)?;
-
-    Ok(config)
-}
-
-fn read_continuous_serial(config: Config, window: Window) -> () {
+fn read_continuous_serial(window: Window) -> () {
     thread::spawn(move || {
-        println!("Starting serial read on port: {}", config.com_port);
+        let config = config::get_config();
+
+        let mut current_volumes: HashMap<String, f32> = HashMap::new();
+        for session_name in &config.inputs {
+            current_volumes.insert(session_name.clone(), 0.0);
+        }
 
         let callback = move |data: String| {
-            let mut split_data = data.split("|");
-
-            println!("Update -> {}", data);
+            let mut new_volumes = data.split("|");
 
             // loop over the split data, get the session name from config, and set the volume
             for session_name in &config.inputs {
-                let new_volume = split_data.next().unwrap_or("-2").parse::<u32>().unwrap() as f32 / 100.0;
-                println!("Handling session: {} -> {}", session_name, new_volume);
+                let current_volume: f32 = *current_volumes.get(session_name).unwrap();
+                let new_volume: f32 = new_volumes.next().unwrap_or("-2").parse::<u32>().unwrap() as f32 / 100.0;
 
-                // Get the current volume; if found set to new, otherwise skip
-                let current_volume = volume_manager::get_session_volume(session_name);
-                if current_volume == -1.0 {
-                    println!("Session not found, skipping: {}", session_name);
+                // In case the volume is the same, skip
+                if current_volume == new_volume {
                     continue;
                 }
 
-                if (current_volume != new_volume) {
-                    println!("Updating {} volume: {} -> {}", session_name, current_volume, new_volume);
-                    volume_manager::set_session_volume(session_name, new_volume);
+                current_volumes.insert(session_name.clone(), new_volume);
 
-                    window.show().unwrap();
-                    window
-                        .emit("volume-change", format!("{}:{}", session_name, new_volume))
-                        .unwrap();
-                }
+                println!("Updaing {} volume: {} -> {}", session_name, current_volume, new_volume);
 
                 // TODO: Handle -1 = mute
+                // TODO: Handle session not currently found in the system (i.e. not open in Windows)
+
+                volume_manager::set_session_volume(session_name, new_volume);
+
+                window.show().unwrap();
+                window
+                    .emit("volume-change", format!("{}:{}", session_name, new_volume))
+                    .unwrap();
             }
         };
 
-        if let Err(e) = serial::read_continuous(&config.com_port, callback) {
+        if let Err(e) = serial::read_continuous(callback) {
             eprintln!("Error reading from serial port: {}", e);
         }
     });
@@ -106,8 +96,7 @@ fn override_media_keys(window: &Window, handle: AppHandle) -> () {
 }
 
 fn main() {
-    let config_path = "../config.yaml";
-    let config = read_config(&config_path).expect("Failed to read config file");
+    let config = config::get_config();
 
     let tray_menu = SystemTrayMenu::new();
     let system_tray = SystemTray::new().with_menu(tray_menu);
@@ -121,7 +110,7 @@ fn main() {
 
             // override_media_keys(&window, handle);
 
-            read_continuous_serial(config, window);
+            read_continuous_serial(window);
 
             Ok(())
         })

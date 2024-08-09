@@ -26,7 +26,7 @@ function App() {
     const volume = Number(event.payload.split(":")[1]);
 
     setProcess(sessionName);
-    setVolume(volume * 100);
+    setVolume(Math.round(volume * 100));
 
     resetHideTimeout();
   });

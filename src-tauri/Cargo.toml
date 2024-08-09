@@ -13,11 +13,11 @@ serde = "^1.0.204"
 serde_json = "^1.0.122"
 serde_yaml = "0.9.34"
 rdev = "^0.5.3"
-serial = "0.4.0"
 chrono = "^0.4.0"
 winapi = { version = "^0.3.9", features = ["endpointvolume"] }
 windows-volume-control = "0.1.1"
 colored = "2.1.0"
+serialport = "4.0"
 
 
 [dependencies.tauri]
