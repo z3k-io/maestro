@@ -26,7 +26,7 @@ function App() {
     const volume = Number(event.payload.split(":")[1]);
 
     setProcess(processName);
-    setVolume(Math.round(volume * 100));
+    setVolume(volume);
 
     resetHideTimeout();
   });
@@ -59,7 +59,7 @@ function App() {
     }
     setVolume(newVolume);
     try {
-      await invoke("set_session_volume", { sessionName: process, volume: newVolume / 100.0 });
+      await invoke("set_session_volume", { sessionName: process, volume: newVolume });
     } catch (error) {
       console.error("Error setting volume", error);
     }

@@ -4,6 +4,7 @@
 - Syncing state between arduino and changes made by media keys or win system settings
 - App icons in UI
 - UI animation
+- If the window has focus, media key handlers don't function properly
 - Create tray menu
   - Debug console
   - Edit config UI

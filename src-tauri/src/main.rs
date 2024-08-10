@@ -28,9 +28,9 @@ fn read_continuous_serial(window: Window) -> () {
     thread::spawn(move || {
         let config = config::get_config();
 
-        let mut current_volumes: HashMap<String, f32> = HashMap::new();
+        let mut current_volumes: HashMap<String, i32> = HashMap::new();
         for session_name in &config.inputs {
-            current_volumes.insert(session_name.clone(), 0.0);
+            current_volumes.insert(session_name.clone(), 0);
         }
 
         let callback = move |data: String| {
@@ -38,8 +38,8 @@ fn read_continuous_serial(window: Window) -> () {
 
             // loop over the split data, get the session name from config, and set the volume
             for session_name in &config.inputs {
-                let current_volume: f32 = *current_volumes.get(session_name).unwrap();
-                let new_volume: f32 = new_volumes.next().unwrap_or("-2").parse::<u32>().unwrap() as f32 / 100.0;
+                let current_volume: i32 = *current_volumes.get(session_name).unwrap();
+                let new_volume: i32 = new_volumes.next().unwrap_or("-2").parse::<i32>().unwrap();
 
                 // In case the volume is the same, skip
                 if current_volume == new_volume {
@@ -50,6 +50,10 @@ fn read_continuous_serial(window: Window) -> () {
 
                 // TODO: Handle -1 = mute
                 // TODO: Handle session not currently found in the system (i.e. not open in Windows)
+                if new_volume == -1 {
+                    println!("Mute not yet implemented");
+                    continue;
+                }
 
                 volume_manager::set_session_volume(session_name, new_volume);
 
@@ -74,7 +78,7 @@ fn override_media_keys(window: Window) {
 
     VolumeUpKey.block_bind(move || {
         let current_vol = volume_manager::get_session_volume("master");
-        let updated_vol = volume_manager::set_session_volume("master", current_vol + 0.02);
+        let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
         window_clone_for_up.show().unwrap();
@@ -83,7 +87,7 @@ fn override_media_keys(window: Window) {
 
     VolumeDownKey.block_bind(move || {
         let current_vol = volume_manager::get_session_volume("master");
-        let updated_vol = volume_manager::set_session_volume("master", current_vol - 0.02);
+        let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
         window_clone_for_down.show().unwrap();
