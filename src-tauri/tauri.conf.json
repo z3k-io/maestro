@@ -29,6 +29,7 @@
       {
         "title": "Mix Monkey",
         "visible": false,
+        "focus": false,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,

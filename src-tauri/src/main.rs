@@ -35,6 +35,7 @@ fn read_continuous_serial(window: Window) -> () {
 
         let callback = move |data: String| {
             let mut new_volumes = data.split("|");
+            // first half will be volues, second half will be mute status
 
             // loop over the split data, get the session name from config, and set the volume
             for session_name in &config.inputs {
@@ -51,16 +52,14 @@ fn read_continuous_serial(window: Window) -> () {
                 // TODO: Handle -1 = mute
                 // TODO: Handle session not currently found in the system (i.e. not open in Windows)
                 if new_volume == -1 {
-                    println!("Mute not yet implemented");
+                    volume_manager::toggle_session_mute(session_name);
                     continue;
                 }
 
                 volume_manager::set_session_volume(session_name, new_volume);
 
                 window.show().unwrap();
-                window
-                    .emit("volume-change", format!("{}:{}", session_name, new_volume))
-                    .unwrap();
+                window.emit("volume-change", format!("{}:{}", session_name, new_volume));
             }
         };
 
@@ -75,23 +74,36 @@ fn override_media_keys(window: Window) {
 
     let window_clone_for_up = Arc::clone(&window);
     let window_clone_for_down = Arc::clone(&window);
+    let window_clone_for_mute = Arc::clone(&window);
+
+    println!("Initializing media key listners");
 
     VolumeUpKey.block_bind(move || {
+        println!("MEDIA KEY: Volume Up");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_up.show().unwrap();
-        window_clone_for_up.emit("volume-change", payload).unwrap();
+        window_clone_for_up.show();
+        window_clone_for_up.emit("volume-change", payload);
     });
 
     VolumeDownKey.block_bind(move || {
+        println!("MEDIA KEY: Volume down");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_down.show().unwrap();
-        window_clone_for_down.emit("volume-change", payload).unwrap();
+        window_clone_for_down.show();
+        window_clone_for_down.emit("volume-change", payload);
+    });
+    VolumeMuteKey.block_bind(move || {
+        println!("MEDIA KEY: Mute");
+        let mute = volume_manager::toggle_session_mute("master");
+
+        let payload = format!("{}:{}", "master", mute);
+        window_clone_for_mute.show();
+        window_clone_for_mute.emit("mute-change", payload);
     });
 
     thread::spawn(move || {
@@ -123,6 +135,7 @@ fn main() {
             volume_manager::set_session_volume,
             volume_manager::master_volume_up,
             volume_manager::master_volume_down,
+            volume_manager::toggle_session_mute,
             window_manager::apply_aero_theme,
         ])
         .system_tray(system_tray)

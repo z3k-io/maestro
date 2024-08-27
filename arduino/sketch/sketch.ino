@@ -45,8 +45,6 @@ void loop() {
   updateMuteStates();
 
   sendVolumeStates();
-
-  // delay(50);
 }
 
 void updateEncoderStates() {
@@ -63,11 +61,7 @@ void updateEncoderStates() {
       encoders[i]->write(MAX_VOLUME * VOLUME_INCREMENT);
     }
 
-    if (muteStates[i]) {
-      digitalEncoderValues[i] = -1;
-    } else {
-      digitalEncoderValues[i] = value / VOLUME_INCREMENT;
-    }
+    digitalEncoderValues[i] = value / VOLUME_INCREMENT;
   }
 }
 
@@ -88,8 +82,6 @@ void updateMuteStates() {
   }
 }
 
-// String lastSendVolumes = "";
-
 void sendVolumeStates() {
   String serializedVolumes = "";
 
@@ -99,6 +91,7 @@ void sendVolumeStates() {
       serializedVolumes += "|";
     }
   }
+  serializedVolumes += "|";
   for (int i = 0; i < NUM_ENCODERS; i++) {
     serializedVolumes += String(muteStates[i]);
     if (i < NUM_ENCODERS - 1) {
@@ -106,9 +99,6 @@ void sendVolumeStates() {
     }
   }
 
-  // if (!lastSendVolumes.equals(serializedVolumes)) {
-    // lastSendVolumes = serializedVolumes;
     Serial.println(serializedVolumes);
     Serial.flush();
-  // }
 }
