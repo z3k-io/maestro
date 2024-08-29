@@ -7,10 +7,11 @@
   - [ ] Mute
   - [ ] Initialize at program start, use winAPI as source of truth
 - [ ] Other config
-  - [ ] Allow user to set in configs
-  - [ ] Map to all other programs
-  - [ ] How to handle mute?
+  - [x] Allow user to set in configs
+  - [x] Map to all other programs
+  - [x] How to handle mute?
   - [ ] What to show in UI
+  - [ ] System Sounds ?
 - [ ] App Icons
   - [ ] Figure out how resolve app specific icons
   - [ ] Add to UI
@@ -27,15 +28,17 @@
   - [ ] switch com
   - [ ] restart
   - [ ] view raw arduino logs
-- [ ] Hook up git hub releases
-- [ ] Create README.md
 - [ ] Volume up should unmute
 - [ ] UI Improvements
   - [ ] Animations?
 - [ ] Upgrade to Tauri 2.0
 - [ ] Lock screen support
 - [ ] Crash recovery / user alerts
-- [ ] License
+- [ ] GitHub
+  - [ ] License
+  - [ ] Workflow to build release
+  - [ ] Documentations
+  - [ ] Auto update - ship new versions / prompt to users when release is published
 
 ### Bugs
 

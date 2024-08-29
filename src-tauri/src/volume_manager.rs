@@ -2,8 +2,9 @@
 
 use std::i32::MIN;
 
-use colored::Colorize;
 use windows_volume_control::AudioController;
+
+use crate::config;
 
 fn get_audio_controller() -> AudioController {
     unsafe {
@@ -45,15 +46,14 @@ pub fn master_volume_down() -> i32 {
 
 #[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {
-    // TODO: Need special handling for 'other' sessions
+    // TODO: *Might* Need special handling for 'other' sessions
     unsafe {
         let controller = get_audio_controller();
         let session = controller.get_session_by_name(session_name.to_string());
 
-        // if session doesn't exist, return // TODO: Need to handle this better
         if session.is_none() {
-            log::info!("{}: {}", "Session not found".red(), session_name.red());
-            return -2;
+            log::warn!("QSession not found: {}", session_name);
+            return MIN;
         }
 
         return (session.unwrap().get_volume() * 100.0).round() as i32;
@@ -62,13 +62,12 @@ pub fn get_session_volume(session_name: &str) -> i32 {
 
 #[tauri::command]
 pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
-    // TODO: Need special handling for 'other' sessions
     if volume < 0 {
-        log::error!("{}", "Volume must be between 0 and 100".red());
+        log::error!("Volume must be between 0 and 100");
         return 0;
     }
     if volume > 100 {
-        log::error!("{}", "Volume must be between 0 and 100".red());
+        log::error!("Volume must be between 0 and 100");
         return 100;
     }
 
@@ -76,19 +75,24 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
 
     unsafe {
         let controller = get_audio_controller();
-        let sessions = controller.get_all_sessions_by_name(session_name.to_string());
+        let mut sessions;
+
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_by_name(session_name.to_string());
+        }
 
         if sessions.is_empty() {
-            log::warn!("{}: {}", "Session not found".red(), session_name.red());
+            log::warn!("RSession not found: {}", session_name);
             return MIN;
         }
 
         for session in sessions {
+            log::info!("Setting {} volume -> {}", session.get_name(), volume);
             session.set_volume(new_volume);
         }
-
-        let message = format!("Setting {} volume -> {}", session_name, volume).green();
-        log::info!("{}", message);
     }
 
     return volume;
@@ -101,7 +105,7 @@ pub fn get_session_mute(session_name: &str) -> bool {
         let session = controller.get_session_by_name(session_name.to_string());
 
         if session.is_none() {
-            log::error!("{}: {}", "Session not found".red(), session_name.red());
+            log::error!("ZSession not found: {}", session_name);
             return false;
         }
 
@@ -113,19 +117,24 @@ pub fn get_session_mute(session_name: &str) -> bool {
 pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
     unsafe {
         let controller = get_audio_controller();
-        let sessions = controller.get_all_sessions_by_name(session_name.to_string());
+        let mut sessions;
+
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_by_name(session_name.to_string());
+        }
 
         if sessions.is_empty() {
-            log::warn!("{}: {}", "Session not found".red(), session_name.red());
+            log::warn!("Session not found: {}", session_name);
             return false;
         }
 
         for session in sessions {
             session.set_mute(mute);
+            log::info!("Setting {} mute -> {}", session.get_name(), mute);
         }
-
-        let message = format!("Setting {} mute -> {}", session_name, mute).green();
-        log::info!("{}", message);
 
         return mute;
     }

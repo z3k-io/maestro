@@ -3903,7 +3903,7 @@ dependencies = [
 [[package]]
 name = "windows-volume-control"
 version = "0.2.0"
-source = "git+https://github.com/zmconnelly/windows-volume-control.git#3b21e40852bd7b9683f6a2e21444cad5268f55c4"
+source = "git+https://github.com/zmconnelly/windows-volume-control.git#d682fef011f927185091bc9f0862aaf91618d5da"
 dependencies = [
  "windows 0.58.0",
 ]

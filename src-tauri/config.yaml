@@ -6,5 +6,5 @@ baud_rate: 9600
 # Special cases
 # - master: system volume of default audio device
 # - other: all active processes not otherwise listed
-inputs: [master, arc, discord]
+inputs: [master, arc, discord, other]
 
