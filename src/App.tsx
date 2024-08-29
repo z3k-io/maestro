@@ -35,7 +35,8 @@ function App() {
       const [processName, volume] = event.payload.split(":");
 
       setProcess(processName);
-      setVolume(Number(volume));
+      setVolume(Math.abs(Number(volume)));
+      setMute(Number(volume) < 0);
 
       resetHideTimeout();
     });
@@ -80,7 +81,7 @@ function App() {
   const handleButtonClick = async () => {
     setMute(!mute);
     try {
-      await invoke("toggle_session_mute");
+      await invoke("toggle_session_mute", { sessionName: process });
     } catch (error) {
       console.error("Error setting mute", error);
     }

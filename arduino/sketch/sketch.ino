@@ -83,22 +83,23 @@ void updateMuteStates() {
 }
 
 void sendVolumeStates() {
-  String serializedVolumes = "";
+  String serializedData = "";
 
   for (int i = 0; i < NUM_ENCODERS; i++) {
-    serializedVolumes += String(digitalEncoderValues[i]);
-    if (i < NUM_ENCODERS - 1) {
-      serializedVolumes += "|";
+    int volume = digitalEncoderValues[i];
+    bool isMuted = muteStates[i];
+
+    // if muted, make volume negative
+    if (isMuted) {
+      volume = volume * -1;
     }
-  }
-  serializedVolumes += "|";
-  for (int i = 0; i < NUM_ENCODERS; i++) {
-    serializedVolumes += String(muteStates[i]);
+
+    serializedData += String(volume);
     if (i < NUM_ENCODERS - 1) {
-      serializedVolumes += "|";
+      serializedData += "|";
     }
   }
 
-    Serial.println(serializedVolumes);
+    Serial.println(serializedData);
     Serial.flush();
 }

@@ -26,34 +26,40 @@ fn read_continuous_serial(window: Window) -> () {
         let config = config::get_config();
 
         let mut current_volumes: HashMap<String, i32> = HashMap::new();
+
         for session_name in &config.inputs {
             current_volumes.insert(session_name.clone(), 0);
         }
 
-        let callback = move |data: String| {
+        let on_serial_update_callback = move |data: String| {
             let mut new_volumes = data.split("|");
-            // first half will be volues, second half will be mute status
 
-            // loop over the split data, get the session name from config, and set the volume
+            // loop over the split data, get the session name from config, and set the volume / mute status
             for session_name in &config.inputs {
                 let current_volume: i32 = *current_volumes.get(session_name).unwrap();
-                let new_volume: i32 = new_volumes.next().unwrap_or("-2").parse::<i32>().unwrap();
+                let new_volume: i32 = new_volumes
+                    .next()
+                    .unwrap_or_else(|| {
+                        log::error!("Error parsing serial data: {}", data);
+                        "0"
+                    })
+                    .parse::<i32>()
+                    .unwrap();
 
-                // In case the volume is the same, skip
                 if current_volume == new_volume {
                     continue;
                 }
 
-                current_volumes.insert(session_name.clone(), new_volume);
-
-                // TODO: Handle -1 = mute
-                // TODO: Handle session not currently found in the system (i.e. not open in Windows)
-                if new_volume == -1 {
-                    volume_manager::toggle_session_mute(session_name);
-                    continue;
+                // if volume is negative, session is muted
+                if new_volume < 0 {
+                    volume_manager::set_session_mute(session_name, true);
+                } else {
+                    volume_manager::set_session_mute(session_name, false);
                 }
 
-                volume_manager::set_session_volume(session_name, new_volume);
+                current_volumes.insert(session_name.clone(), new_volume);
+
+                volume_manager::set_session_volume(session_name, new_volume.abs());
 
                 window.show().unwrap();
                 window
@@ -62,7 +68,7 @@ fn read_continuous_serial(window: Window) -> () {
             }
         };
 
-        if let Err(e) = serial::read_continuous(callback) {
+        if let Err(e) = serial::read_continuous(on_serial_update_callback) {
             log::info!("Error reading from serial port: {}", e);
         }
     });

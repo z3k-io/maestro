@@ -12,17 +12,20 @@ pub struct Config {
 // Static variable to hold the config singleton
 static CONFIG: OnceLock<Arc<Config>> = OnceLock::new();
 
+// const CONFIG_PATH: &'static str = "src-tauri/config.yaml";
 const CONFIG_PATH: &'static str = "config.yaml";
 
 // Function to initialize the config
 fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
-    log::debug!("Loading config from: {}", CONFIG_PATH);
+    // print working dir
+    log::info!("Current working directory: {:?}", std::env::current_dir()?);
+    log::info!("Loading config from: {}", CONFIG_PATH);
     let mut file = File::open(CONFIG_PATH)?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
-    log::debug!("Config loaded: {}", contents);
+    log::info!("Config loaded: {}", contents);
 
     let config: Config = serde_yaml::from_str(&contents)?;
 
