@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "start": "tauri dev",
-    "rust": "cargo watch -x run"
+    "release": "tauri build"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.6.0",

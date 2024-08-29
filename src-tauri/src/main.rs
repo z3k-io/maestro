@@ -3,23 +3,22 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(warnings)]
 
-use serde::Deserialize;
+use flexi_logger::{Duplicate, FileSpec, Logger, WriteMode};
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
 use std::sync::Arc;
 use std::thread;
 use tauri::App;
-use tauri::AppHandle;
-use tauri::Config;
+use tauri::CustomMenuItem;
+use tauri::Manager;
 use tauri::SystemTray;
+use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::Window;
-use tauri::{GlobalShortcutManager, Manager};
 
 use inputbot::{KeySequence, KeybdKey::*, MouseButton::*};
 
 mod config;
+mod logger;
 mod serial;
 mod volume_manager;
 mod window_manager;
@@ -64,7 +63,7 @@ fn read_continuous_serial(window: Window) -> () {
         };
 
         if let Err(e) = serial::read_continuous(callback) {
-            eprintln!("Error reading from serial port: {}", e);
+            log::info!("Error reading from serial port: {}", e);
         }
     });
 }
@@ -76,10 +75,10 @@ fn override_media_keys(window: Window) {
     let window_clone_for_down = Arc::clone(&window);
     let window_clone_for_mute = Arc::clone(&window);
 
-    println!("Initializing media key listners");
+    log::info!("Initializing media key listners");
 
     VolumeUpKey.block_bind(move || {
-        println!("MEDIA KEY: Volume Up");
+        log::info!("MEDIA KEY: Volume Up");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
 
@@ -89,7 +88,7 @@ fn override_media_keys(window: Window) {
     });
 
     VolumeDownKey.block_bind(move || {
-        println!("MEDIA KEY: Volume down");
+        log::info!("MEDIA KEY: Volume down");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
 
@@ -98,7 +97,7 @@ fn override_media_keys(window: Window) {
         window_clone_for_down.emit("volume-change", payload);
     });
     VolumeMuteKey.block_bind(move || {
-        println!("MEDIA KEY: Mute");
+        log::info!("MEDIA KEY: Mute");
         let mute = volume_manager::toggle_session_mute("master");
 
         let payload = format!("{}:{}", "master", mute);
@@ -112,15 +111,37 @@ fn override_media_keys(window: Window) {
 }
 
 fn main() {
-    let config = config::get_config();
+    logger::init_logger();
 
-    let tray_menu = SystemTrayMenu::new();
+    // Configure system tray menu
+    let open_console = CustomMenuItem::new("show_logs".to_string(), "Open Logs");
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let tray_menu = SystemTrayMenu::new().add_item(open_console).add_item(quit);
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     tauri::Builder::default()
+        .system_tray(system_tray)
+        .on_system_tray_event(move |app, event| match event {
+            SystemTrayEvent::LeftClick { .. } => {
+                let window = app.get_window("main").unwrap();
+                window.show().unwrap();
+            }
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                if id == "quit" {
+                    std::process::exit(0);
+                }
+                if id == "show_logs" {
+                    log::info!("Opening log file");
+                    logger::open_log_file();
+                }
+            }
+            _ => {}
+        })
         .setup(|app: &mut App| {
-            let window: Window = app.get_window("main").unwrap();
-            let handle: AppHandle = app.handle();
+            log::info!("Tauri app is starting...");
+
+            let window = app.get_window("main").unwrap();
+            let handle = app.handle();
 
             window_manager::center_window_at_top(&window);
 
@@ -138,7 +159,6 @@ fn main() {
             volume_manager::toggle_session_mute,
             window_manager::apply_aero_theme,
         ])
-        .system_tray(system_tray)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

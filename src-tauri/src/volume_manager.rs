@@ -48,7 +48,7 @@ pub fn set_master_volume(volume: i32) {
 
 #[tauri::command]
 pub fn master_volume_up() -> i32 {
-    println!("MEDIA KEY: Volume up - UI");
+    log::info!("MEDIA KEY: Volume up - UI");
     let volume = get_master_volume();
     let new_volume = volume + 2;
     set_master_volume(new_volume);
@@ -57,7 +57,7 @@ pub fn master_volume_up() -> i32 {
 
 #[tauri::command]
 pub fn master_volume_down() -> i32 {
-    println!("MEDIA KEY: Volume down - UI");
+    log::info!("MEDIA KEY: Volume down - UI");
     let volume = get_master_volume();
     let new_volume = volume - 2;
     set_master_volume(new_volume);
@@ -74,7 +74,7 @@ pub fn get_session_volume(session_name: &str) -> i32 {
 
         // if session doesn't exist, return // TODO: Need to handle this better
         if session.is_none() {
-            println!("{}: {}", "Session not found".red(), session_name_cased.red());
+            log::info!("{}: {}", "Session not found".red(), session_name_cased.red());
             return -2;
         }
 
@@ -86,11 +86,11 @@ pub fn get_session_volume(session_name: &str) -> i32 {
 pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
     // TODO: Need special handling for 'other' sessions
     if volume < 0 {
-        println!("{}", "Volume must be between 0 and 100".red());
+        log::info!("{}", "Volume must be between 0 and 100".red());
         return 0;
     }
     if volume > 100 {
-        println!("{}", "Volume must be between 0 and 100".red());
+        log::info!("{}", "Volume must be between 0 and 100".red());
         return 100;
     }
 
@@ -102,7 +102,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
         let session = controller.get_session_by_name(session_name_cased.to_string());
 
         if session.is_none() {
-            println!("{}: {}", "Session not found".red(), session_name.red());
+            log::info!("{}: {}", "Session not found".red(), session_name.red());
             return -2;
         }
 
@@ -116,7 +116,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
         session.unwrap().setVolume(new_volume);
 
         let message = format!("Setting {} volume -> {}", session_name, volume).green();
-        println!("{}", message);
+        log::info!("{}", message);
     }
 
     return volume;
@@ -141,7 +141,7 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
         session.unwrap().setMute(mute);
 
         let message = format!("Setting {} mute -> {}", session_name, mute).green();
-        println!("{}", message);
+        log::info!("{}", message);
 
         return session.unwrap().getMute();
     }
@@ -149,7 +149,7 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
 
 #[tauri::command]
 pub fn toggle_session_mute(session_name: &str) -> bool {
-    println!("TOGGLE MUTE: {}", session_name);
+    log::info!("TOGGLE MUTE: {}", session_name);
     let mute = get_session_mute(session_name);
     return set_session_mute(session_name, !mute);
 }
