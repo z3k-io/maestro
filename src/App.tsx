@@ -109,7 +109,7 @@ function App() {
           min={0}
           max="100"
           value={volume}
-          className="range range-xs range-primary"
+          className={`range range-xs ${mute ? "range-error" : "range-primary"}`}
           onChange={handleSliderChange}
         />
         <h2 className="text-lg w-12 text-center">{volume}</h2>
