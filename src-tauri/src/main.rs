@@ -1,9 +1,7 @@
 // src/main.rs
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-#![allow(warnings)]
 
-use flexi_logger::{Duplicate, FileSpec, Logger, WriteMode};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
@@ -15,7 +13,7 @@ use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::Window;
 
-use inputbot::{KeySequence, KeybdKey::*, MouseButton::*};
+use inputbot::KeybdKey::*;
 
 mod config;
 mod logger;
@@ -58,7 +56,9 @@ fn read_continuous_serial(window: Window) -> () {
                 volume_manager::set_session_volume(session_name, new_volume);
 
                 window.show().unwrap();
-                window.emit("volume-change", format!("{}:{}", session_name, new_volume));
+                window
+                    .emit("volume-change", format!("{}:{}", session_name, new_volume))
+                    .unwrap();
             }
         };
 
@@ -83,8 +83,8 @@ fn override_media_keys(window: Window) {
         let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_up.show();
-        window_clone_for_up.emit("volume-change", payload);
+        window_clone_for_up.show().unwrap();
+        window_clone_for_up.emit("volume-change", payload).unwrap();
     });
 
     VolumeDownKey.block_bind(move || {
@@ -93,16 +93,16 @@ fn override_media_keys(window: Window) {
         let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
 
         let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_down.show();
-        window_clone_for_down.emit("volume-change", payload);
+        window_clone_for_down.show().unwrap();
+        window_clone_for_down.emit("volume-change", payload).unwrap();
     });
     VolumeMuteKey.block_bind(move || {
         log::info!("MEDIA KEY: Mute");
         let mute = volume_manager::toggle_session_mute("master");
 
         let payload = format!("{}:{}", "master", mute);
-        window_clone_for_mute.show();
-        window_clone_for_mute.emit("mute-change", payload);
+        window_clone_for_mute.show().unwrap();
+        window_clone_for_mute.emit("mute-change", payload).unwrap();
     });
 
     thread::spawn(move || {
@@ -141,7 +141,6 @@ fn main() {
             log::info!("Tauri app is starting...");
 
             let window = app.get_window("main").unwrap();
-            let handle = app.handle();
 
             window_manager::center_window_at_top(&window);
 

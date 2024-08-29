@@ -1,9 +1,8 @@
 // src/serial.rs
 
-use std::borrow::Borrow;
 use std::io::{self, BufRead, BufReader};
 use std::sync::{Arc, Mutex};
-use std::thread::{self, sleep};
+use std::thread::{self};
 use std::time::{Duration, Instant};
 
 use crate::config;
@@ -25,7 +24,7 @@ where
         .timeout(Duration::from_millis(100))
         .open()?;
 
-    serial_port.write_data_terminal_ready(true);
+    serial_port.write_data_terminal_ready(true).unwrap();
 
     let reader = BufReader::new(serial_port);
 

@@ -1,13 +1,6 @@
 // src/volume_manager.rs
 
 use colored::Colorize;
-use windows::core::Interface;
-use windows::Win32::Foundation::*;
-use windows::Win32::Media::Audio::MMDeviceEnumerator;
-use windows::Win32::Media::Audio::*;
-use windows::Win32::System::Com::*;
-use windows::Win32::System::ProcessStatus::*;
-use windows::Win32::System::Threading::*;
 use windows_volume_control::AudioController;
 
 fn get_audio_controller() -> AudioController {
@@ -68,7 +61,7 @@ pub fn master_volume_down() -> i32 {
 pub fn get_session_volume(session_name: &str) -> i32 {
     // TODO: Need special handling for 'other' sessions
     unsafe {
-        let mut controller = get_audio_controller();
+        let controller = get_audio_controller();
         let session_name_cased = get_case_sensitive_session_name(session_name);
         let session = controller.get_session_by_name(session_name_cased.to_string());
 
@@ -97,7 +90,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
     let new_volume = volume as f32 / 100.0;
 
     unsafe {
-        let mut controller = get_audio_controller();
+        let controller = get_audio_controller();
         let session_name_cased = get_case_sensitive_session_name(session_name);
         let session = controller.get_session_by_name(session_name_cased.to_string());
 
@@ -125,7 +118,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
 #[tauri::command]
 pub fn get_session_mute(session_name: &str) -> bool {
     unsafe {
-        let mut controller = get_audio_controller();
+        let controller = get_audio_controller();
         let session = controller.get_session_by_name(session_name.to_string());
 
         return session.unwrap().getMute();
@@ -135,7 +128,7 @@ pub fn get_session_mute(session_name: &str) -> bool {
 #[tauri::command]
 pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
     unsafe {
-        let mut controller = get_audio_controller();
+        let controller = get_audio_controller();
         let session = controller.get_session_by_name(session_name.to_string());
 
         session.unwrap().setMute(mute);
