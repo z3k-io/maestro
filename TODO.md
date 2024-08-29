@@ -23,18 +23,19 @@
     - [ ] App icons on / off
     - [ ] Timeout for UI visible
 - [ ] Tray Menu
-
   - [ ] List com ports
   - [ ] switch com
   - [ ] restart
   - [ ] view raw arduino logs
-
+- [ ] Hook up git hub releases
+- [ ] Create README.md
 - [ ] Volume up should unmute
 - [ ] UI Improvements
   - [ ] Animations?
 - [ ] Upgrade to Tauri 2.0
 - [ ] Lock screen support
 - [ ] Crash recovery / user alerts
+- [ ] License
 
 ### Bugs
 
