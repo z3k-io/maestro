@@ -1,20 +1,49 @@
-- Handle 'other' option
-- Syncing state between arduino and changes made by media keys or win system settings
-- App icons in UI
-- UI animation
-- Should volume up auto disable mute like it does with win? Need to back propagate value to arduino to make work if so.
-- Tauri 2.0
-- Make work on lock screen?
-- Create tray menu
-  - Debug console
-  - Edit config UI
-  - Exit
-  - List com ports, switch
-  - Open file location / config, etc.
+# Mix Monkey: In the Pipeline
 
-Bugs
+### New Features
+
+- [ ] Propagate state back to arduino
+  - [ ] Volume
+  - [ ] Mute
+  - [ ] Initialize at program start, use winAPI as source of truth
+- [ ] Other config
+  - [ ] Allow user to set in configs
+  - [ ] Map to all other programs
+  - [ ] How to handle mute?
+  - [ ] What to show in UI
+- [ ] App Icons
+  - [ ] Figure out how resolve app specific icons
+  - [ ] Add to UI
+- [ ] User config / settings
+  - [ ] Option in tray menu
+  - [ ] Options in config.yaml
+  - [ ] Read write / update config.yaml based on tray menu choices - just open an editor? reload on close?
+  - [ ] Feature flag support
+    - [ ] Theme/styling
+    - [ ] App icons on / off
+    - [ ] Timeout for UI visible
+- [ ] Tray Menu
+
+  - [ ] List com ports
+  - [ ] switch com
+  - [ ] restart
+  - [ ] view raw arduino logs
+
+- [ ] Volume up should unmute
+- [ ] UI Improvements
+  - [ ] Animations?
+- [ ] Upgrade to Tauri 2.0
+- [ ] Lock screen support
+- [ ] Crash recovery / user alerts
+
+### Bugs
 
 - Element focus outlines
-  - Need to drop / reset window focus on close hook
+- App taking focus blocks media key event listeners
+  - Preventing / reseting focus on close should avoid
 - First run slider broken / no volume set
 - Crashes when try click UI, used to work.
+
+### Completed ✓
+
+- [x] A lot of stuff!
