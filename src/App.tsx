@@ -46,7 +46,6 @@ function App() {
     };
   }, []);
 
-  // TODO: This isn't working
   function resetHideTimeout() {
     console.debug("Resetting hide timeout");
     if (hideTimeoutRef.current) {
@@ -54,6 +53,7 @@ function App() {
     }
     hideTimeoutRef.current = setTimeout(() => {
       console.debug("Hiding window");
+      // invoke("blur_window");
       appWindow.hide();
     }, 3000);
   }
@@ -81,7 +81,8 @@ function App() {
   const handleButtonClick = async () => {
     setMute(!mute);
     try {
-      await invoke("toggle_session_mute", { sessionName: process });
+      console.log("Setting mute", process, mute);
+      // await invoke("toggle_session_mute", { sessionName: process });
     } catch (error) {
       console.error("Error setting mute", error);
     }

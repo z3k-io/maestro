@@ -114,6 +114,22 @@ fn override_media_keys(window: Window) {
     });
 }
 
+#[tauri::command]
+fn blur_window(window: Window) {
+    log::info!("Blurring window");
+    // window.show().unwrap();
+    let focused = window.is_focused().unwrap();
+    log::info!("Window focused: {}", focused);
+
+    // TODO: Fix focus state
+    // Unfocusing a window seems to be currently unsupported in tauri.
+    // Work around might be to create / destroy window on open / close
+    // Would still break during open state after focused though
+
+    // window.close().unwrap();
+    window.hide().unwrap();
+}
+
 fn main() {
     logger::init_logger();
 
@@ -159,6 +175,7 @@ fn main() {
             volume_manager::set_session_volume,
             volume_manager::toggle_session_mute,
             window_manager::apply_aero_theme,
+            blur_window
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
