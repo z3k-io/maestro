@@ -43,3 +43,6 @@ Mix Monkey is built with [Tauri](https://tauri.app/). It runs a Rust application
     Recommendations
       - VSCode
       - RustFMT
+      - Bun
+
+    To run in dev mode, simply run `bun start` from the project root.

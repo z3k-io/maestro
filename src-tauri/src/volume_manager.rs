@@ -1,5 +1,3 @@
-// src/volume_manager.rs
-
 use std::i32::MIN;
 
 use windows_volume_control::AudioController;
@@ -17,42 +15,13 @@ fn get_audio_controller() -> AudioController {
 }
 
 #[tauri::command]
-pub fn get_master_volume() -> i32 {
-    return get_session_volume("master");
-}
-
-#[tauri::command]
-pub fn set_master_volume(volume: i32) {
-    set_session_volume("master", volume);
-}
-
-#[tauri::command]
-pub fn master_volume_up() -> i32 {
-    log::info!("MEDIA KEY: Volume up - UI");
-    let volume = get_master_volume();
-    let new_volume = volume + 2;
-    set_master_volume(new_volume);
-    return new_volume;
-}
-
-#[tauri::command]
-pub fn master_volume_down() -> i32 {
-    log::info!("MEDIA KEY: Volume down - UI");
-    let volume = get_master_volume();
-    let new_volume = volume - 2;
-    set_master_volume(new_volume);
-    return new_volume;
-}
-
-#[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {
-    // TODO: *Might* Need special handling for 'other' sessions
     unsafe {
         let controller = get_audio_controller();
         let session = controller.get_session_by_name(session_name.to_string());
 
         if session.is_none() {
-            log::warn!("QSession not found: {}", session_name);
+            log::warn!("Get Volume: No Session Found: {}", session_name);
             return MIN;
         }
 
@@ -85,7 +54,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
         }
 
         if sessions.is_empty() {
-            log::warn!("RSession not found: {}", session_name);
+            log::warn!("Set Volume: No Session Found: {}", session_name);
             return MIN;
         }
 
@@ -105,7 +74,7 @@ pub fn get_session_mute(session_name: &str) -> bool {
         let session = controller.get_session_by_name(session_name.to_string());
 
         if session.is_none() {
-            log::error!("ZSession not found: {}", session_name);
+            log::error!("Get Mute: No Session Found: {}", session_name);
             return false;
         }
 
@@ -127,7 +96,7 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
         }
 
         if sessions.is_empty() {
-            log::warn!("Session not found: {}", session_name);
+            log::warn!("Set Mute: No Session Found: {}", session_name);
             return false;
         }
 

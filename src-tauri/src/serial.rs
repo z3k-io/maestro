@@ -1,5 +1,3 @@
-// src/serial.rs
-
 use std::io::{self, BufRead, BufReader};
 use std::sync::{Arc, Mutex};
 use std::thread::{self};
@@ -20,9 +18,7 @@ where
 
     log::info!("Starting serial read on port: {}", com_port);
 
-    let mut serial_port = serialport::new(com_port, baud_rate)
-        .timeout(Duration::from_millis(100))
-        .open()?;
+    let mut serial_port = serialport::new(com_port, baud_rate).timeout(Duration::from_millis(100)).open()?;
 
     serial_port.write_data_terminal_ready(true).unwrap();
 

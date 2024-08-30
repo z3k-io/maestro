@@ -37,6 +37,7 @@
 - [ ] GitHub
   - [ ] License
   - [ ] Workflow to build release
+  - [ ] Versioning
   - [ ] Documentations
   - [ ] Auto update - ship new versions / prompt to users when release is published
 

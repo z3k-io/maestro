@@ -62,9 +62,7 @@ fn read_continuous_serial(window: Window) -> () {
                 volume_manager::set_session_volume(session_name, new_volume.abs());
 
                 window.show().unwrap();
-                window
-                    .emit("volume-change", format!("{}:{}", session_name, new_volume))
-                    .unwrap();
+                window.emit("volume-change", format!("{}:{}", session_name, new_volume)).unwrap();
             }
         };
 
@@ -84,7 +82,7 @@ fn override_media_keys(window: Window) {
     log::info!("Initializing media key listners");
 
     VolumeUpKey.block_bind(move || {
-        log::info!("MEDIA KEY: Volume Up");
+        log::debug!("[MEDIA KEY] Volume Up");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
 
@@ -94,7 +92,7 @@ fn override_media_keys(window: Window) {
     });
 
     VolumeDownKey.block_bind(move || {
-        log::info!("MEDIA KEY: Volume down");
+        log::debug!("[MEDIA KEY] Volume down");
         let current_vol = volume_manager::get_session_volume("master");
         let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
 
@@ -103,7 +101,7 @@ fn override_media_keys(window: Window) {
         window_clone_for_down.emit("volume-change", payload).unwrap();
     });
     VolumeMuteKey.block_bind(move || {
-        log::info!("MEDIA KEY: Mute");
+        log::debug!("[MEDIA KEY] Mute");
         let mute = volume_manager::toggle_session_mute("master");
 
         let payload = format!("{}:{}", "master", mute);
@@ -159,8 +157,6 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             volume_manager::get_session_volume,
             volume_manager::set_session_volume,
-            volume_manager::master_volume_up,
-            volume_manager::master_volume_down,
             volume_manager::toggle_session_mute,
             window_manager::apply_aero_theme,
         ])
