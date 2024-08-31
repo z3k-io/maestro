@@ -82,7 +82,7 @@ function App() {
     setMute(!mute);
     try {
       console.log("Setting mute", process, mute);
-      // await invoke("toggle_session_mute", { sessionName: process });
+      await invoke("toggle_session_mute", { sessionName: process });
     } catch (error) {
       console.error("Error setting mute", error);
     }
