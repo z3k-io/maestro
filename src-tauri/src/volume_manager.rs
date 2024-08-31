@@ -1,15 +1,16 @@
-use std::i32::MIN;
+use std::{
+    i32::MIN,
+    sync::{Mutex, Once},
+};
 
-use windows_volume_control::AudioController;
+use windows_volume_control::{AudioController, CoinitMode};
 
 use crate::config;
 
 fn get_audio_controller() -> AudioController {
     unsafe {
-        let mut controller = AudioController::init(None);
-        controller.get_sessions();
-        controller.get_default_audio_enpoint_volume_control();
-        controller.get_all_process_sessions();
+        let mut controller = AudioController::init(Some(CoinitMode::ApartmentThreaded));
+        controller.load_current_sessions();
         return controller;
     }
 }
@@ -17,8 +18,8 @@ fn get_audio_controller() -> AudioController {
 #[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
-        let controller = get_audio_controller();
-        let session = controller.get_session_by_name(session_name.to_string());
+        let controller = AudioController::init(Some(CoinitMode::MultiTreaded));
+        let session = controller.get_session_with_name(session_name.to_string());
 
         if session.is_none() {
             log::warn!("Get Volume: No Session Found: {}", session_name);
@@ -50,7 +51,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
             sessions = controller.get_all_sessions();
             sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
         } else {
-            sessions = controller.get_all_sessions_by_name(session_name.to_string());
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
         }
 
         if sessions.is_empty() {
@@ -71,7 +72,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
 pub fn get_session_mute(session_name: &str) -> bool {
     unsafe {
         let controller = get_audio_controller();
-        let session = controller.get_session_by_name(session_name.to_string());
+        let session = controller.get_session_with_name(session_name.to_string());
 
         if session.is_none() {
             log::error!("Get Mute: No Session Found: {}", session_name);
@@ -92,7 +93,7 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
             sessions = controller.get_all_sessions();
             sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
         } else {
-            sessions = controller.get_all_sessions_by_name(session_name.to_string());
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
         }
 
         if sessions.is_empty() {
