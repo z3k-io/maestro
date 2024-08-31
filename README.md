@@ -21,7 +21,7 @@ Run the app and turn the dials.
 
 Contributions are welcome, create an Issue or open a Merge Request.
 
-## Acknoledgements
+## Acknowledgements
 
 This App took a lot of inspiration for the excellent project [Deej](https://github.com/omriharel) by Omri Harel. For 3D printable designs, and more insights, check out their repo and related searches on 3D model sites.
 

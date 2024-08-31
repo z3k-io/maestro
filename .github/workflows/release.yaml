@@ -3,7 +3,7 @@ name: Build and Release App
 on:
   push:
     tags:
-      - "v*.*.*" # Triggers the workflow on version tag pushes (e.g., v1.0.0)
+      - "v*.*.*"
 
 jobs:
   build:
@@ -17,28 +17,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          export BUN_INSTALL="$HOME/.bun"
+          export PATH="$BUN_INSTALL/bin:$PATH"
+          bun --version
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          profile: minimal
+          node-version: "22"
 
       - name: Install Tauri CLI and dependencies
         run: |
-          npm install
-          npm install -g @tauri-apps/cli
+          bun install
+          bun add -g @tauri-apps/cli
 
       - name: Build Tauri app
-        run: npm run tauri build
+        run: bun run tauri build
 
       - name: Upload Release Artifact
-        if: startsWith(matrix.platform, 'windows') || startsWith(matrix.platform, 'ubuntu') || startsWith(matrix.platform, 'macos')
         uses: actions/upload-artifact@v3
         with:
           name: Tauri App (${{ matrix.platform }})
