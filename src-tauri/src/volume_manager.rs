@@ -1,7 +1,4 @@
-use std::{
-    i32::MIN,
-    sync::{Mutex, Once},
-};
+use std::i32::MIN;
 
 use windows_volume_control::{AudioController, CoinitMode};
 

@@ -14,27 +14,20 @@ jobs:
         platform: [windows-latest]
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Bun
-        run: |
-          curl -fsSL https://bun.sh/install | bash
-          export BUN_INSTALL="$HOME/.bun"
-          export PATH="$BUN_INSTALL/bin:$PATH"
-          bun --version
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "22"
+          bun-version: latest
 
-      - name: Install Tauri CLI and dependencies
+      - name: Install Tauri CLI and Dependencies
         run: |
           bun install
           bun add -g @tauri-apps/cli
 
-      - name: Build Tauri app
+      - name: Build Tauri App
         run: bun run tauri build
 
       - name: Upload Release Artifact
