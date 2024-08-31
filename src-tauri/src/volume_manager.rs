@@ -1,113 +1,118 @@
-// src/volume_manager.rs
+use std::{
+    i32::MIN,
+    sync::{Mutex, Once},
+};
 
-use std::sync::{Mutex, Once};
+use windows_volume_control::{AudioController, CoinitMode};
 
-use colored::Colorize;
-use windows::core::Interface;
-use windows::Win32::Foundation::*;
-use windows::Win32::Media::Audio::MMDeviceEnumerator;
-use windows::Win32::Media::Audio::*;
-use windows::Win32::System::Com::*;
-use windows::Win32::System::ProcessStatus::*;
-use windows::Win32::System::Threading::*;
-use windows_volume_control::AudioController;
-use windows_volume_control::CoinitMode;
+use crate::config;
 
-static mut AUDIO_CONTROLLER: Option<Mutex<AudioController>> = None;
-static INIT: Once = Once::new();
-
-fn get_audio_controller() -> &'static Mutex<AudioController> {
+fn get_audio_controller() -> AudioController {
     unsafe {
-        INIT.call_once(|| {
-            let controller = AudioController::init(None); // Directly use the returned controller
-            AUDIO_CONTROLLER = Some(Mutex::new(controller));
-        });
-        AUDIO_CONTROLLER.as_ref().expect("AudioController not initialized")
+        let mut controller = AudioController::init(Some(CoinitMode::ApartmentThreaded));
+        controller.load_current_sessions();
+        return controller;
     }
 }
 
-// TODO: Handle mute states
-
 #[tauri::command]
-pub fn get_master_volume() -> f32 {
-    return get_session_volume("master");
-}
-
-#[tauri::command]
-pub fn set_master_volume(volume: f32) {
-    set_session_volume("master", volume);
-}
-
-#[tauri::command]
-pub fn master_volume_up() -> f32 {
-    println!("Volume up");
-    let volume = get_master_volume();
-    let new_volume = volume + 0.02;
-    set_master_volume(new_volume);
-    return new_volume;
-}
-
-#[tauri::command]
-pub fn master_volume_down() -> f32 {
-    println!("Volume down");
-    let volume = get_master_volume();
-    let new_volume = volume - 0.02;
-    set_master_volume(new_volume);
-    return new_volume;
-}
-
-#[tauri::command]
-pub fn get_session_volume(session_name: &str) -> f32 {
-    // TODO: Need special handling for 'other' sessions
+pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
-        let mut controller = get_audio_controller().lock().unwrap();
-        controller.GetSessions();
-        controller.GetDefaultAudioEnpointVolumeControl();
-        controller.GetAllProcessSessions();
-        let test = controller.get_all_session_names();
-        let session = controller.get_session_by_name(session_name.to_string());
+        let controller = AudioController::init(Some(CoinitMode::MultiTreaded));
+        let session = controller.get_session_with_name(session_name.to_string());
 
-        // if session doesn't exist, return
         if session.is_none() {
-            println!("{}: {}", "Session not found".red(), session_name.red());
-            return -1.0;
+            log::warn!("Get Volume: No Session Found: {}", session_name);
+            return MIN;
         }
 
-        return (session.unwrap().getVolume() * 100.0).round() / 100.0;
+        return (session.unwrap().get_volume() * 100.0).round() as i32;
     }
 }
 
 #[tauri::command]
-pub fn set_session_volume(session_name: &str, volume: f32) -> f32 {
-    // TODO: Need special handling for 'other' sessions
-    if volume < 0.0 {
-        println!("{}", "Volume must be between 0.0 and 1.0".red());
-        return 0.0;
+pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
+    if volume < 0 {
+        log::error!("Volume must be between 0 and 100");
+        return 0;
     }
-    if volume > 1.0 {
-        println!("{}", "Volume must be between 0.0 and 1.0".red());
-        return 1.0;
+    if volume > 100 {
+        log::error!("Volume must be between 0 and 100");
+        return 100;
     }
+
+    let new_volume = volume as f32 / 100.0;
 
     unsafe {
-        let mut controller = get_audio_controller().lock().unwrap();
-        controller.GetSessions();
-        controller.GetDefaultAudioEnpointVolumeControl();
-        controller.GetAllProcessSessions();
-        let test = controller.get_all_session_names();
-        let session = controller.get_session_by_name(session_name.to_string());
+        let controller = get_audio_controller();
+        let mut sessions;
 
-        // if session doesn't exist, return
-        if session.is_none() {
-            println!("{}: {}", "Session not found".red(), session_name.red());
-            return -1.0;
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
         }
 
-        session.unwrap().setVolume(volume);
+        if sessions.is_empty() {
+            log::warn!("Set Volume: No Session Found: {}", session_name);
+            return MIN;
+        }
 
-        let message = format!("Setting {} volume -> {}", session_name, volume).green();
-        println!("{}", message);
+        for session in sessions {
+            log::info!("Setting {} volume -> {}", session.get_name(), volume);
+            session.set_volume(new_volume);
+        }
     }
 
-    return (volume * 100.0).round() / 100.0;
+    return volume;
+}
+
+#[tauri::command]
+pub fn get_session_mute(session_name: &str) -> bool {
+    unsafe {
+        let controller = get_audio_controller();
+        let session = controller.get_session_with_name(session_name.to_string());
+
+        if session.is_none() {
+            log::error!("Get Mute: No Session Found: {}", session_name);
+            return false;
+        }
+
+        return session.unwrap().get_mute();
+    }
+}
+
+#[tauri::command]
+pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
+    unsafe {
+        let controller = get_audio_controller();
+        let mut sessions;
+
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
+        }
+
+        if sessions.is_empty() {
+            log::warn!("Set Mute: No Session Found: {}", session_name);
+            return false;
+        }
+
+        for session in sessions {
+            session.set_mute(mute);
+            log::info!("Setting {} mute -> {}", session.get_name(), mute);
+        }
+
+        return mute;
+    }
+}
+
+#[tauri::command]
+pub fn toggle_session_mute(session_name: &str) -> bool {
+    log::info!("TOGGLE MUTE: {}", session_name);
+    let mute = get_session_mute(session_name);
+    return set_session_mute(session_name, !mute);
 }

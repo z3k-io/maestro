@@ -1,9 +1,6 @@
-// src/serial.rs
-
-use std::borrow::Borrow;
 use std::io::{self, BufRead, BufReader};
 use std::sync::{Arc, Mutex};
-use std::thread::{self, sleep};
+use std::thread::{self};
 use std::time::{Duration, Instant};
 
 use crate::config;
@@ -19,13 +16,11 @@ where
     let com_port = config.com_port.clone();
     let baud_rate = config.baud_rate.clone();
 
-    println!("Starting serial read on port: {}", com_port);
+    log::info!("Starting serial read on port: {}", com_port);
 
-    let mut serial_port = serialport::new(com_port, baud_rate)
-        .timeout(Duration::from_millis(100))
-        .open()?;
+    let mut serial_port = serialport::new(com_port, baud_rate).timeout(Duration::from_millis(100)).open()?;
 
-    serial_port.write_data_terminal_ready(true);
+    serial_port.write_data_terminal_ready(true).unwrap();
 
     let reader = BufReader::new(serial_port);
 
@@ -59,7 +54,7 @@ where
                 *data = Some(line);
             }
             Err(e) => {
-                eprintln!("Error reading from serial port: {:?}", e);
+                log::info!("Error reading from serial port: {:?}", e);
             }
         }
     }

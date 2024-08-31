@@ -10,16 +10,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener("keydown", async (e) => {
   console.log(e.key);
-  if (e.key === "AudioVolumeUp") {
-    await invoke("master_volume_up");
-  }
-  if (e.key === "AudioVolumeDown") {
-    await invoke("master_volume_down");
-  }
-  if (e.key === "Mute") {
-    await invoke("master_volume_mute");
-  }
+  // if (e.key === "AudioVolumeUp") {
+  //   await invoke("master_volume_up");
+  // }
+  // if (e.key === "AudioVolumeDown") {
+  //   await invoke("master_volume_down");
+  // }
+  // if (e.key === "Mute") {
+  //   await invoke("master_volume_mute");
+  // }
 
+  e.stopPropagation();
   e.preventDefault();
 });
 
