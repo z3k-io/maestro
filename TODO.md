@@ -6,10 +6,11 @@
   - [ ] Volume
   - [ ] Mute
   - [ ] Initialize at program start, use winAPI as source of truth
-- [ ] Other config
+- [ ] Config
   - [x] Allow user to set in configs
   - [x] Map to all other programs
   - [x] How to handle mute?
+  - [ ] Support multiple inputs for a single encoder
   - [ ] What to show in UI
   - [ ] System Sounds ?
 - [ ] App Icons
@@ -48,6 +49,7 @@
   - Preventing / reseting focus on close should avoid
 - First run slider broken / no volume set
 - Crashes when try click UI, used to work.
+- Don't unmute when lowering volume
 
 ### Completed ✓
 

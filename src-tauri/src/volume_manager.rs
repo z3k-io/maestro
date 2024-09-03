@@ -15,7 +15,7 @@ fn get_audio_controller() -> AudioController {
 #[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
-        let controller = AudioController::init(Some(CoinitMode::MultiTreaded));
+        let controller = get_audio_controller();
         let session = controller.get_session_with_name(session_name.to_string());
 
         if session.is_none() {
