@@ -97,7 +97,7 @@ function App() {
       onMouseOver={resetHideTimeout}
       onContextMenu={() => setMute(!mute)}
     >
-      <h1 className="flex justify-center capitalize font-semibold text-md">{process}</h1>
+      <h1 className="flex justify-center capitalize font-semibold text-md">{process === "other" ? "Everything Else" : process}</h1>
       <div className="flex flex-row items-center gap-2 px-4">
         <button
           className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-200 rounded-md"

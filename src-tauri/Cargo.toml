@@ -1,6 +1,6 @@
 [package]
 name = "mix-monkey"
-version = "0.1.0"
+version = "0.2.11"
 description = "Desktop Audio Manager"
 authors = ["Zach Connelly"]
 edition = "2021"
@@ -11,9 +11,7 @@ tauri-build = { version = "^1.5.3", features = [] }
 [dependencies]
 serde = "^1.0.204"
 serde_yaml = "0.9.34"
-winapi = { version = "^0.3.9", features = ["endpointvolume", "shellapi"] }
 windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-control.git" }
-colored = "2.1.0"
 serialport = "4.0"
 inputbot = "0.6"
 log = "0.4"
