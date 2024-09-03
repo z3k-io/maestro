@@ -7,7 +7,7 @@ const tauriConfigPath = "src-tauri/tauri.conf.json";
 const cargoTomlPath = "src-tauri/Cargo.toml";
 
 const pushChanges = (newVersion) => {
-  execSync("git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml");
+  execSync("git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock");
   execSync(`git commit -m "Bump version to ${newVersion}"`);
   execSync(`git tag -a v${newVersion} -m "Version ${newVersion}"`);
 
