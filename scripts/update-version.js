@@ -4,9 +4,10 @@ import readline from "readline";
 
 const packageJsonPath = "package.json";
 const tauriConfigPath = "src-tauri/tauri.conf.json";
+const cargoTomlPath = "src-tauri/Cargo.toml";
 
 const pushChanges = (newVersion) => {
-  execSync("git add package.json src-tauri/tauri.conf.json");
+  execSync("git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml");
   execSync(`git commit -m "Bump version to ${newVersion}"`);
   execSync(`git tag -a v${newVersion} -m "Version ${newVersion}"`);
 
@@ -33,17 +34,22 @@ const getNewVersion = (version, type = "patch") => {
 };
 
 const updateAppVersion = (type) => {
+  // Update package.json
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
   const oldVersion = packageJson.version;
-
   const newVersion = getNewVersion(packageJson.version, type);
   packageJson.version = newVersion;
-
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
+  // Update tauri.conf.json
   const tauriConfig = JSON.parse(fs.readFileSync(tauriConfigPath, "utf8"));
   tauriConfig.package.version = newVersion;
   fs.writeFileSync(tauriConfigPath, JSON.stringify(tauriConfig, null, 2));
+
+  // Update Cargo.toml
+  let cargoToml = fs.readFileSync(cargoTomlPath, "utf8");
+  cargoToml = cargoToml.replace(/version\s*=\s*"\d+\.\d+\.\d+"/, `version = "${newVersion}"`);
+  fs.writeFileSync(cargoTomlPath, cargoToml);
 
   console.log(`Version bumped from ${oldVersion} to ${newVersion}`);
 
