@@ -2,8 +2,8 @@ name: Build and Release App
 
 on:
   push:
-    branches:
-      - "*"
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -35,8 +35,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.build_release.outputs.releaseId }}
-          tag: v${{ steps.build_release.outputs.appVersion }}
+          tag_name: v${{ steps.build_release.outputs.appVersion }}
           files: |
             config.yaml
             arduino/sketch/sketch.ino
