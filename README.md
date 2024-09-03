@@ -21,10 +21,6 @@ Run the app and turn the dials.
 
 Contributions are welcome, create an Issue or open a Merge Request.
 
-## License
-
-TK
-
 ### Implementation
 
 Mix Monkey is built with [Tauri](https://tauri.app/). It runs a Rust application as a background process which listens for volume change events over a COM port. It processes serial data and interfaces with the Windows API to change program volume status according to user supplied configs. It also controls an overlay window that serves to replace the basic volume change UI Microsoft provides. This window is actually a webpage built and styled with [React](https://react.dev/) and [Tailwind](https://tailwindcss.com/) that is then run in a headless window using the OS provided [WebView2 Runtime](https://learn.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH).

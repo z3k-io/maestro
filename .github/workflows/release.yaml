@@ -28,7 +28,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tagName: mix-monkey-v__VERSION__ # action automatically replaces __VERSION__ with app version.
+          tagName: v__VERSION__ # action automatically replaces __VERSION__ with app version.
           releaseName: "v__VERSION__"
           releaseBody: "See the assets to download this version and install."
 
@@ -36,6 +36,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.build_release.outputs.releaseId }}
+          tag: v${{ steps.build_release.outputs.appVersion }}
           files: |
             config.yaml
             arduino/sketch/sketch.ino
