@@ -3,7 +3,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::collections::HashMap;
-use std::sync::Arc;
 use std::thread;
 use tauri::App;
 use tauri::CustomMenuItem;
@@ -13,9 +12,8 @@ use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::Window;
 
-use inputbot::KeybdKey::*;
-
 mod config;
+mod event_listeners;
 mod logger;
 mod serial;
 mod volume_manager;
@@ -27,16 +25,16 @@ fn read_continuous_serial(window: Window) -> () {
 
         let mut current_volumes: HashMap<String, i32> = HashMap::new();
 
-        for session_name in &config.inputs {
-            current_volumes.insert(session_name.clone(), 0);
+        for session in &config.sessions {
+            current_volumes.insert(session.name.clone(), 0);
         }
 
         let on_serial_update_callback = move |data: String| {
             let mut new_volumes = data.split("|");
 
             // loop over the split data, get the session name from config, and set the volume / mute status
-            for session_name in &config.inputs {
-                let current_volume: i32 = *current_volumes.get(session_name).unwrap();
+            for session in &config.sessions {
+                let current_volume: i32 = *current_volumes.get(&session.name).unwrap();
                 let new_volume: i32 = new_volumes
                     .next()
                     .unwrap_or_else(|| {
@@ -52,65 +50,23 @@ fn read_continuous_serial(window: Window) -> () {
 
                 // if volume is negative, session is muted
                 if new_volume < 0 {
-                    volume_manager::set_session_mute(session_name, true);
+                    volume_manager::set_session_mute(&session.name, true);
                 } else {
-                    volume_manager::set_session_mute(session_name, false);
+                    volume_manager::set_session_mute(&session.name, false);
                 }
 
-                current_volumes.insert(session_name.clone(), new_volume);
+                current_volumes.insert(session.name.clone(), new_volume);
 
-                volume_manager::set_session_volume(session_name, new_volume.abs());
+                volume_manager::set_session_volume(&session.name, new_volume.abs());
 
                 window.show().unwrap();
-                window.emit("volume-change", format!("{}:{}", session_name, new_volume)).unwrap();
+                window.emit("volume-change", format!("{}:{}", &session.name, new_volume)).unwrap();
             }
         };
 
         if let Err(e) = serial::read_continuous(on_serial_update_callback) {
             log::info!("Error reading from serial port: {}", e);
         }
-    });
-}
-
-fn override_media_keys(window: Window) {
-    let window = Arc::new(window); // Wrap the window in Arc for shared ownership
-
-    let window_clone_for_up = Arc::clone(&window);
-    let window_clone_for_down = Arc::clone(&window);
-    let window_clone_for_mute = Arc::clone(&window);
-
-    log::info!("Initializing media key listners");
-
-    VolumeUpKey.block_bind(move || {
-        log::debug!("[MEDIA KEY] Volume Up");
-        let current_vol = volume_manager::get_session_volume("master");
-        let updated_vol = volume_manager::set_session_volume("master", current_vol + 2);
-
-        let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_up.show().unwrap();
-        window_clone_for_up.emit("volume-change", payload).unwrap();
-    });
-
-    VolumeDownKey.block_bind(move || {
-        log::debug!("[MEDIA KEY] Volume down");
-        let current_vol = volume_manager::get_session_volume("master");
-        let updated_vol = volume_manager::set_session_volume("master", current_vol - 2);
-
-        let payload = format!("{}:{}", "master", updated_vol);
-        window_clone_for_down.show().unwrap();
-        window_clone_for_down.emit("volume-change", payload).unwrap();
-    });
-    VolumeMuteKey.block_bind(move || {
-        log::debug!("[MEDIA KEY] Mute");
-        let mute = volume_manager::toggle_session_mute("master");
-
-        let payload = format!("{}:{}", "master", mute);
-        window_clone_for_mute.show().unwrap();
-        window_clone_for_mute.emit("mute-change", payload).unwrap();
-    });
-
-    thread::spawn(move || {
-        inputbot::handle_input_events();
     });
 }
 
@@ -164,7 +120,7 @@ fn main() {
 
             window_manager::center_window_at_top(&window);
 
-            override_media_keys(window.clone());
+            event_listeners::override_media_keys(window.clone());
 
             read_continuous_serial(window);
 

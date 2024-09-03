@@ -15,10 +15,10 @@ function App() {
     const unlisten = listen<String>("mute-change", (event) => {
       console.debug(`Mute change event: ${event.payload}`);
 
-      const [processName, mute] = event.payload.split(":");
+      const [processName, muteState] = event.payload.split(":");
 
       setProcess(processName);
-      setMute(Boolean(mute));
+      setMute(muteState === "true"); // Change this line
 
       resetHideTimeout();
     });
@@ -27,6 +27,10 @@ function App() {
       unlisten.then((r) => r());
     };
   }, []);
+
+  useEffect(() => {
+    console.debug("Mute is", mute);
+  }, [mute]);
 
   useEffect(() => {
     const unlisten = listen<String>("volume-change", (event) => {
@@ -95,7 +99,7 @@ function App() {
       onMouseMove={resetHideTimeout}
       onMouseUp={resetHideTimeout}
       onMouseOver={resetHideTimeout}
-      onContextMenu={() => setMute(!mute)}
+      onContextMenu={() => handleButtonClick()} // Change this line
     >
       <h1 className="flex justify-center capitalize font-semibold text-md">{process === "other" ? "Everything Else" : process}</h1>
       <div className="flex flex-row items-center gap-2 px-4">

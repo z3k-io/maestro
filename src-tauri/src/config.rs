@@ -8,10 +8,23 @@ const CONFIG_PATH: &'static str = "config.yaml";
 // const CONFIG_PATH: &'static str = "src-tauri/config.yaml";
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct KeybindConfig {
+    pub key: String,
+    pub action: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SessionConfig {
+    pub name: String,
+    pub encoder: u8,
+    pub keybinds: Option<Vec<KeybindConfig>>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub com_port: String,
     pub baud_rate: u32,
-    pub inputs: Vec<String>,
+    pub sessions: Vec<SessionConfig>,
 }
 static CONFIG: OnceLock<Arc<Config>> = OnceLock::new();
 
@@ -34,8 +47,12 @@ fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
 // Return all defined sessions except for 'other'
 pub fn get_defined_session_names() -> Vec<String> {
     let config = get_config();
-    let mut session_names = config.inputs.clone();
-    session_names.retain(|name| name != "other");
+    let session_names: Vec<String> = config
+        .sessions
+        .iter()
+        .filter(|session| session.name.to_lowercase() != "other")
+        .map(|session| session.name.clone())
+        .collect();
     return session_names.iter().map(|name| name.to_lowercase()).collect();
 }
 
