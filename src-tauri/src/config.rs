@@ -8,6 +8,12 @@ const CONFIG_PATH: &'static str = "config.yaml";
 // const CONFIG_PATH: &'static str = "src-tauri/config.yaml";
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct ArduinoConfig {
+    pub com_port: String,
+    pub baud_rate: u32,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct KeybindConfig {
     pub key: String,
     pub action: String,
@@ -22,8 +28,7 @@ pub struct SessionConfig {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
-    pub com_port: String,
-    pub baud_rate: u32,
+    pub arduino: ArduinoConfig,
     pub sessions: Vec<SessionConfig>,
 }
 static CONFIG: OnceLock<Arc<Config>> = OnceLock::new();

@@ -13,8 +13,8 @@ where
 {
     let config = config::get_config();
 
-    let com_port = config.com_port.clone();
-    let baud_rate = config.baud_rate.clone();
+    let com_port = config.arduino.com_port.clone();
+    let baud_rate = config.arduino.baud_rate.clone();
 
     log::info!("Starting serial read on port: {}", com_port);
 

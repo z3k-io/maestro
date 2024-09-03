@@ -30,19 +30,15 @@ fn read_continuous_serial(window: Window) -> () {
         }
 
         let on_serial_update_callback = move |data: String| {
-            let mut new_volumes = data.split("|");
+            let new_volumes = data.split("|");
 
-            // loop over the split data, get the session name from config, and set the volume / mute status
-            for session in &config.sessions {
+            for (index, new_volume) in new_volumes.enumerate() {
+                // look up session name from encoder index
+                let session = &config.sessions.iter().find(|s| s.encoder == index as u8).unwrap();
+                // let session = &config.sessions[index];
+                let new_volume: i32 = new_volume.parse::<i32>().unwrap();
+
                 let current_volume: i32 = *current_volumes.get(&session.name).unwrap();
-                let new_volume: i32 = new_volumes
-                    .next()
-                    .unwrap_or_else(|| {
-                        log::error!("Error parsing serial data: {}", data);
-                        "0"
-                    })
-                    .parse::<i32>()
-                    .unwrap();
 
                 if current_volume == new_volume {
                     continue;

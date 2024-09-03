@@ -1,13 +1,9 @@
-# Arduio interface
-com_port: COM3
-baud_rate: 9600
-
 # Define schema for audio session to input mapping
 # Sessions may be controlled either by serial input (encoders) or key macros
 # Master is a reserved session name for system volume control
 # Other is a reserved session name for all active processes not otherwise listed
 sessions:
-- name: master
+- name: "master"
   encoder: 0
   keybinds:
   - key: Ctrl+Shift+Up
@@ -16,9 +12,14 @@ sessions:
     action: VolumeDown
   - key: Ctrl+Shift+M
     action: ToggleMute
-- name: chrome
+- name: "chrome"
   encoder: 1
-- name: discord
+- name: "discord"
   encoder: 2
-- name: other
+- name: "other"
   encoder: 3
+
+# Arduino connection config
+arduino:
+  com_port: COM3
+  baud_rate: 9600
