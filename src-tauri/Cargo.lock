@@ -1736,7 +1736,7 @@ dependencies = [
 
 [[package]]
 name = "mix-monkey"
-version = "0.2.17"
+version = "0.2.18"
 dependencies = [
  "flexi_logger",
  "inputbot",
