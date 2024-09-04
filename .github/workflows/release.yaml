@@ -21,6 +21,14 @@ jobs:
         with:
           workspaces: "src-tauri -> target"
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - run: bun install
 
       - name: Build
@@ -37,7 +45,8 @@ jobs:
         with:
           tag_name: v${{ steps.build_release.outputs.appVersion }}
           files: |
-            config.yaml
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/config.yaml
             arduino/sketch/sketch.ino
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
