@@ -1,32 +1,28 @@
+import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/tauri";
 import { appWindow } from "@tauri-apps/api/window";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom/client";
 import SpeakerIcon from "./components/SpeakerIcon";
+import "./styles.css";
 
-function App() {
+window.addEventListener("DOMContentLoaded", () => {
+  invoke("apply_aero_theme");
+});
+
+window.addEventListener("keydown", async (e) => {
+  console.log(e.key);
+
+  e.stopPropagation();
+  e.preventDefault();
+});
+
+const VolumeOverlay = () => {
   const [process, setProcess] = useState("master");
   const [volume, setVolume] = useState(0);
   const [mute, setMute] = useState(false);
 
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const unlisten = listen<String>("mute-change", (event) => {
-      console.debug(`Mute change event: ${event.payload}`);
-
-      const [processName, muteState] = event.payload.split(":");
-
-      setProcess(processName);
-      setMute(muteState === "true"); // Change this line
-
-      resetHideTimeout();
-    });
-
-    return () => {
-      unlisten.then((r) => r());
-    };
-  }, []);
 
   useEffect(() => {
     console.debug("Mute is", mute);
@@ -57,9 +53,8 @@ function App() {
     }
     hideTimeoutRef.current = setTimeout(() => {
       console.debug("Hiding window");
-      // invoke("blur_window");
       appWindow.hide();
-    }, 3000);
+    }, 1500);
   }
 
   async function updateVolume(newVolume: number) {
@@ -92,6 +87,8 @@ function App() {
     }
   };
 
+  resetHideTimeout();
+
   return (
     <div
       className="flex flex-col h-screen w-screen bg-base-300 justify-center"
@@ -99,10 +96,9 @@ function App() {
       onMouseMove={resetHideTimeout}
       onMouseUp={resetHideTimeout}
       onMouseOver={resetHideTimeout}
-      onContextMenu={() => handleButtonClick()} // Change this line
     >
-      <h1 className="flex justify-center capitalize font-semibold text-md">{process === "other" ? "Everything Else" : process}</h1>
-      <div className="flex flex-row items-center gap-2 px-4">
+      <h1 className="flex justify-center capitalize font-semibold text-md">{process}</h1>
+      <div className="flex flex-row items-center px-4">
         <button
           className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-200 rounded-md"
           onClick={() => handleButtonClick()}
@@ -121,6 +117,10 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
-export default App;
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  <React.StrictMode>
+    <VolumeOverlay />
+  </React.StrictMode>,
+);

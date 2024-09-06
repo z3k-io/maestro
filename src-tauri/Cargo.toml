@@ -19,7 +19,7 @@ flexi_logger = "0.29.0"
 
 [dependencies.tauri]
 version = "^1.7.1"
-features = [
+features = [ "window-set-size",
     "system-tray",
     "global-shortcut-all",
     "global-shortcut",

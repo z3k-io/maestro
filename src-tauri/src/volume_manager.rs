@@ -1,4 +1,4 @@
-use std::i32::MIN;
+use std::{collections::HashMap, i32::MIN};
 
 use windows_volume_control::{AudioController, CoinitMode};
 
@@ -9,6 +9,26 @@ fn get_audio_controller() -> AudioController {
         let mut controller = AudioController::init(Some(CoinitMode::ApartmentThreaded));
         controller.load_current_sessions();
         return controller;
+    }
+}
+
+#[tauri::command]
+pub fn get_all_sessions() -> HashMap<String, i32> {
+    unsafe {
+        let controller = get_audio_controller();
+        let sessions = controller.get_all_sessions();
+
+        let mut session_volumes: HashMap<String, i32> = HashMap::new();
+        for session in sessions {
+            let mut volume = (session.get_volume() * 100.0).round() as i32;
+            let mute = session.get_mute();
+            if mute {
+                volume = volume * -1;
+            }
+            session_volumes.insert(session.get_name().to_string(), volume);
+        }
+
+        return session_volumes;
     }
 }
 

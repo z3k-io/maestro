@@ -228,9 +228,14 @@ fn handle_session_down(session_name: &str, window: WindowWrapper) {
 fn handle_session_toggle_mute(session_name: &str, window: WindowWrapper) {
     log::info!("Session toggle mute: {}", session_name);
     let mute = volume_manager::toggle_session_mute(session_name);
+    let mut volume = volume_manager::get_session_volume(session_name);
 
-    let payload = format!("{}:{}", session_name, mute);
-    window.show_and_emit("mute-change", payload);
+    if mute {
+        volume = volume * -1
+    }
+
+    let payload = format!("{}:{}", session_name, volume);
+    window.show_and_emit("volume-change", payload);
 }
 
 fn handle_action(action: &str, session_name: &str, window: WindowWrapper) {

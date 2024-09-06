@@ -14,7 +14,8 @@
       "window": {
         "setPosition": true,
         "hide": true,
-        "show": true
+        "show": true,
+        "setSize": true
       },
       "all": false,
       "shell": {
@@ -27,7 +28,9 @@
     },
     "windows": [
       {
-        "title": "Mix Monkey",
+        "title": "Volume Overlay",
+        "url": "index-overlay.html",
+        "label": "overlay",
         "visible": false,
         "focus": false,
         "decorations": false,
@@ -43,7 +46,7 @@
       }
     ],
     "systemTray": {
-      "iconPath": "icons/32x32.png",
+      "iconPath": "icons/icon.ico",
       "iconAsTemplate": true
     },
     "security": {
@@ -53,17 +56,8 @@
       "active": true,
       "targets": "nsis",
       "identifier": "com.ccc.mixmonkey",
-      "resources": [
-        "config.yaml",
-        "../arduino/sketch/sketch.ino"
-      ],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
+      "resources": ["config.yaml", "../arduino/sketch/sketch.ino"],
+      "icon": ["icons/icon.ico", "icons/icon.icns", "icons/icon.png"]
     }
   }
 }

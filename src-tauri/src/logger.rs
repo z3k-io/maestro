@@ -2,6 +2,15 @@ use flexi_logger::{DeferredNow, Duplicate, FileSpec, Logger, WriteMode};
 use log::Record;
 use std::{io::Write, process::Command};
 
+#[tauri::command]
+pub fn log(message: String, level: &str) {
+    match level {
+        "info" => log::info!("UI: {}", message),
+        "error" => log::error!("UI: {}", message),
+        _ => log::info!("UI: {}", message),
+    }
+}
+
 pub fn open_log_file() {
     Command::new("explorer").arg("logs").spawn().unwrap();
 }
