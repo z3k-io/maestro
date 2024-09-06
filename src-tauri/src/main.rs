@@ -18,6 +18,7 @@ use tauri::WindowBuilder;
 mod config;
 mod event_listeners;
 mod logger;
+mod process_utils;
 mod serial;
 mod volume_manager;
 mod window_manager;
@@ -88,8 +89,10 @@ fn blur_window(window: Window) {
 fn emit_initial_volumes(window: Window) {
     let sessions = volume_manager::get_all_sessions();
 
-    for (session, volume) in &sessions {
-        window.emit("volume-change", format!("{}:{}", &session, volume)).unwrap();
+    for session in &sessions {
+        window
+            .emit("volume-change", format!("{}:{}", session.name, session.volume))
+            .unwrap();
     }
 }
 

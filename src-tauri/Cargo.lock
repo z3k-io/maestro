@@ -1738,6 +1738,7 @@ dependencies = [
 name = "mix-monkey"
 version = "0.2.18"
 dependencies = [
+ "base64 0.22.1",
  "flexi_logger",
  "inputbot",
  "log",
@@ -3928,8 +3929,8 @@ dependencies = [
 
 [[package]]
 name = "windows-volume-control"
-version = "0.2.0"
-source = "git+https://github.com/zmconnelly/windows-volume-control.git#db8a6a0b8169f60ecb3e57e791fa9a6a3a3acb43"
+version = "0.3.0"
+source = "git+https://github.com/zmconnelly/windows-volume-control.git?branch=main#ce15acf1b02572b5c7322c8e0fa8fb9f771f4845"
 dependencies = [
  "windows 0.58.0",
 ]
