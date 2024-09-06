@@ -4,11 +4,24 @@ import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@taur
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
-import { info } from "./logger";
+import { info, warn } from "./logger";
 import "./styles.css";
 
 window.addEventListener("DOMContentLoaded", async () => {
   invoke("apply_aero_theme");
+});
+
+listen<Boolean>(`visibility_change`, (event) => {
+  warn(`Visibility change event: ${event.payload}`);
+
+  const visible = event.payload;
+
+  if (visible) {
+    appWindow.show();
+    appWindow.setFocus();
+  } else {
+    appWindow.hide();
+  }
 });
 
 class Session {
@@ -25,25 +38,6 @@ class Session {
 
 const VolumeMixerPanel = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
-
-  useEffect(() => {
-    const unlisten = listen<Boolean>(`visibility_change`, (event) => {
-      info(`Visibility change event: ${event.payload}`);
-
-      const visible = event.payload;
-
-      if (visible) {
-        appWindow.show();
-        appWindow.setFocus();
-      } else {
-        appWindow.hide();
-      }
-    });
-
-    return () => {
-      unlisten.then((r) => r());
-    };
-  }, []);
 
   const fetchSessions = async () => {
     const rawSessions = await invoke("get_all_sessions");
@@ -70,6 +64,7 @@ const VolumeMixerPanel = () => {
     fetchSessions();
 
     const unlistenFocus = appWindow.onFocusChanged((event) => {
+      warn(`Focus change event: ${event.payload}`);
       if (event) {
         fetchSessions();
       }
@@ -99,6 +94,8 @@ const VolumeMixerPanel = () => {
 
     info(`Setting position: ${x} ${y}`);
     await appWindow.setPosition(new PhysicalPosition(x, y));
+
+    appWindow.setFocus();
   };
 
   setTimeout(() => {

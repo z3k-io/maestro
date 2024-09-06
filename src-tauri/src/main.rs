@@ -152,9 +152,11 @@ fn main() {
 
 fn toggle_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_window("mixer_window") {
+        log::info!("Toggling window");
         let is_visible = window.is_visible().unwrap();
         window.emit("visibility_change", !is_visible).unwrap();
     } else {
+        log::info!("Creating new window");
         create_new_window(app);
     }
 }
@@ -166,15 +168,20 @@ fn create_new_window(app: &tauri::AppHandle) {
         .always_on_top(true)
         .skip_taskbar(true)
         .resizable(true)
+        .focused(true)
         .visible(false)
         .build()
         .expect("Failed to create new window");
 
-    // mixer_window.show().expect("Failed to show new window");
-    // mixer_window.set_focus().unwrap();
-
     let last_focus_time = Arc::new(Mutex::new(Instant::now()));
     let mixer_window_clone = mixer_window.clone();
+    let mixer_window_clone2 = mixer_window.clone();
+
+    // in 50ms, show the window
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        mixer_window_clone2.emit("visibility_change", true).unwrap();
+    });
 
     mixer_window.on_window_event(move |event| match event {
         tauri::WindowEvent::Focused(is_focused) => {
@@ -184,7 +191,6 @@ fn create_new_window(app: &tauri::AppHandle) {
                 let last_time = *last_focus_time.lock().unwrap();
                 if last_time.elapsed() > Duration::from_millis(100) {
                     mixer_window_clone.emit("visibility_change", false).unwrap();
-                    // mixer_window_clone.hide().unwrap();
                 }
             }
         }
