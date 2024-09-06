@@ -4,7 +4,7 @@ import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@taur
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
-import { info, warn } from "./logger";
+import { warn } from "./logger";
 import "./styles.css";
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 listen<Boolean>(`visibility_change`, (event) => {
-  warn(`Visibility change event: ${event.payload}`);
+  // warn(`Visibility change event: ${event.payload}`);
 
   const visible = event.payload;
 
@@ -24,32 +24,33 @@ listen<Boolean>(`visibility_change`, (event) => {
   }
 });
 
-class Session {
+class SessionData {
   name: string;
   volume: number;
-  mute: boolean;
+  icon: string | null;
 
-  constructor(name: string, volume: number, mute: boolean) {
-    this.name = name;
-    this.volume = volume;
-    this.mute = mute;
+  constructor(data: any) {
+    this.name = data["name"];
+    this.volume = data["volume"];
+    this.icon = data["icon"];
   }
 }
 
 const VolumeMixerPanel = () => {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionData[]>([]);
 
   const fetchSessions = async () => {
     const rawSessions = await invoke("get_all_sessions");
-    const sessionsObj = rawSessions as Record<string, number>;
-    const sessionsArray = Object.entries(sessionsObj);
+    const sessionsArray = Object.entries(rawSessions as []);
 
-    const sessions = new Array<Session>();
+    const sessions = new Array<SessionData>();
 
-    sessionsArray.forEach(([key, value]) => {
-      console.log(key, value);
-      sessions.push(new Session(key, value, false));
+    sessionsArray.forEach((session) => {
+      // warn(`Session: ${JSON.stringify(session)}`);
+      sessions.push(new SessionData(session[1]));
     });
+
+    warn(`Sessions: ${JSON.stringify(sessions)}`);
 
     sessions.sort((a, b) => {
       if (a.name.toLowerCase() === "master") return -1;
@@ -86,13 +87,13 @@ const VolumeMixerPanel = () => {
     let windowWidth = Math.round(300 * scaleFactor);
     let windowHeight = Math.round(sessions.length * 92 * scaleFactor);
 
-    info(`Setting window size: ${windowWidth} ${windowHeight}`);
+    // info(`Setting window size: ${windowWidth} ${windowHeight}`);
     await appWindow.setSize(new PhysicalSize(windowWidth, windowHeight));
 
     let x = screenWidth - windowWidth;
     let y = screenHeight - (windowHeight + 80);
 
-    info(`Setting position: ${x} ${y}`);
+    // info(`Setting position: ${x} ${y}`);
     await appWindow.setPosition(new PhysicalPosition(x, y));
 
     appWindow.setFocus();
