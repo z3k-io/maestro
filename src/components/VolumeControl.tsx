@@ -63,7 +63,7 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
   const iconSrc = props.icon ? `data:image/png;base64,${props.icon}` : "/speaker-128.png";
 
   return (
-    <div className="flex flex-col items-center gap-0 bg-base-200 mt-2 mx-2 p-2 rounded-md h-14 justify-center">
+    <div className="flex flex-col items-center gap-0 bg-base-200 mx-2 p-2 rounded-md h-14 justify-center">
       <div className="flex flex-row items-center gap-2">
         <img src={iconSrc} className="h-5 w-5 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md" />
         <button

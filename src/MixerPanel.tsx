@@ -11,17 +11,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   invoke("apply_aero_theme");
 });
 
-listen<Boolean>(`visibility_change`, (event) => {
-  const visible = event.payload;
-
-  if (visible) {
-    appWindow.show();
-    appWindow.setFocus();
-  } else {
-    appWindow.hide();
-  }
-});
-
 class SessionData {
   name: string;
   volume: number;
@@ -45,6 +34,21 @@ const VolumeMixerPanel = () => {
     debug(`Sessions changed`);
     setWindowSizeAndPosition();
   }, [sessions]);
+
+  useEffect(() => {
+    listen<Boolean>(`visibility_change`, async (event) => {
+      const visible = event.payload;
+
+      if (visible) {
+        await fetchSessions();
+
+        appWindow.show();
+        appWindow.setFocus();
+      } else {
+        appWindow.hide();
+      }
+    });
+  }, []);
 
   const fetchSessions = async () => {
     const rawSessions = await invoke("get_all_sessions");
@@ -78,7 +82,7 @@ const VolumeMixerPanel = () => {
 
     // Calculate height based on number of sessions
     const baseHeight = 75;
-    const padding = 20;
+    const padding = 40;
     let windowHeight = Math.round((sessions.length * baseHeight + padding) * scaleFactor);
 
     debug(`Setting window size: ${windowWidth} ${windowHeight}`);
@@ -93,9 +97,12 @@ const VolumeMixerPanel = () => {
 
   return (
     <div id="container" className="flex flex-col h-screen w-screen bg-base-300 justify-center">
-      {sessions.map((session) => (
-        <VolumeControl key={session.name} sessionName={session.name} volume={session.volume} icon={session.icon} />
-      ))}
+      <h1 className="text-md font-bold py-2 px-4">Volume Mixer</h1>
+      <div className="flex flex-col gap-2">
+        {sessions.map((session) => (
+          <VolumeControl key={session.name} sessionName={session.name} volume={session.volume} icon={session.icon} />
+        ))}
+      </div>
     </div>
   );
 };
