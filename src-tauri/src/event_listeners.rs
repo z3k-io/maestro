@@ -2,7 +2,7 @@ use inputbot::{KeybdKey::*, *};
 use std::{collections::HashSet, sync::Arc, thread};
 use tauri::Window;
 
-use crate::{config::get_config, volume_manager};
+use crate::{config::get_config, events::AppEvent, volume_manager};
 
 #[derive(Clone)]
 struct WindowWrapper(Arc<Window>);
@@ -12,9 +12,9 @@ impl WindowWrapper {
         WindowWrapper(Arc::new(window))
     }
 
-    fn show_and_emit(&self, event: &str, payload: String) {
+    fn show_and_emit(&self, event: AppEvent, payload: String) {
         self.0.show().unwrap();
-        self.0.emit(event, payload).unwrap();
+        self.0.emit(event.as_str(), payload).unwrap();
     }
 }
 
@@ -213,7 +213,7 @@ fn handle_session_up(session_name: &str, window: WindowWrapper) {
     let updated_vol = volume_manager::set_session_volume(session_name, current_vol + 2);
 
     let payload = format!("{}:{}", session_name, updated_vol);
-    window.show_and_emit("volume-change", payload);
+    window.show_and_emit(AppEvent::VolumeChange, payload);
 }
 
 fn handle_session_down(session_name: &str, window: WindowWrapper) {
@@ -222,7 +222,7 @@ fn handle_session_down(session_name: &str, window: WindowWrapper) {
     let updated_vol = volume_manager::set_session_volume(session_name, current_vol - 2);
 
     let payload = format!("{}:{}", session_name, updated_vol);
-    window.show_and_emit("volume-change", payload);
+    window.show_and_emit(AppEvent::VolumeChange, payload);
 }
 
 fn handle_session_toggle_mute(session_name: &str, window: WindowWrapper) {
@@ -235,7 +235,7 @@ fn handle_session_toggle_mute(session_name: &str, window: WindowWrapper) {
     }
 
     let payload = format!("{}:{}", session_name, volume);
-    window.show_and_emit("volume-change", payload);
+    window.show_and_emit(AppEvent::VolumeChange, payload);
 }
 
 fn handle_action(action: &str, session_name: &str, window: WindowWrapper) {

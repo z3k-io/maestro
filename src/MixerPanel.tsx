@@ -1,27 +1,16 @@
 import { invoke } from "@tauri-apps/api";
-import { listen } from "@tauri-apps/api/event";
 import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
-import { debug } from "./logger";
 import "./styles.css";
+import { SessionData } from "./types/sessionData";
+import { AppEvent, listenToEvent } from "./utils/events";
+import { debug } from "./utils/logger";
 
 window.addEventListener("DOMContentLoaded", async () => {
   invoke("apply_aero_theme");
 });
-
-class SessionData {
-  name: string;
-  volume: number;
-  icon: string | null;
-
-  constructor(data: any) {
-    this.name = data["name"];
-    this.volume = data["volume"];
-    this.icon = data["icon"];
-  }
-}
 
 const VolumeMixerPanel = () => {
   const [sessions, setSessions] = useState<SessionData[]>([]);
@@ -36,9 +25,7 @@ const VolumeMixerPanel = () => {
   }, [sessions]);
 
   useEffect(() => {
-    listen<Boolean>(`visibility_change`, async (event) => {
-      const visible = event.payload;
-
+    listenToEvent(AppEvent.MixerVisibilityChange, async (visible: boolean) => {
       if (visible) {
         await fetchSessions();
 
@@ -57,7 +44,7 @@ const VolumeMixerPanel = () => {
     const sessions = new Array<SessionData>();
 
     sessionsArray.forEach((session) => {
-      sessions.push(new SessionData(session[1]));
+      sessions.push(session[1] as SessionData);
     });
 
     debug(`Sessions: ${JSON.stringify(sessions)}`);

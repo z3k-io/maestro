@@ -3,6 +3,7 @@
 ### New Features
 
 - [ ] Propagate state back to arduino
+  - [ ] Should we even do this? Just move all logic rust side?
   - [ ] Volume
   - [ ] Mute
   - [ ] Initialize at program start, use winAPI as source of truth
@@ -10,14 +11,13 @@
   - [ ] Support multiple inputs for a single encoder
   - [ ] What to show in UI
 - [ ] App Icons
-  - [ ] Figure out how resolve app specific icons
-  - [ ] Add to UI
+  - [ ] Cache icon base64 in memory
+  - [ ] How to handle mapped application that isnt running?
 - [ ] User config / settings
   - [ ] Option in tray menu
   - [ ] Read write / update config.yaml based on tray menu choices - just open an editor? reload on close?
   - [ ] Feature flag support
     - [ ] Theme/styling
-    - [ ] App icons on / off
     - [ ] Timeout for UI visible
 - [ ] Tray Menu
   - [ ] List com ports
@@ -39,9 +39,13 @@
 - App taking focus blocks media key event listeners
   - Preventing / reseting focus on close should avoid
 - First run slider broken / no volume set
-- Crashes when try click UI, used to work.
 - config.yaml is being bundle with / not overwritten or honored
   - AppData\Local\mix-monkey
+
+### Tech Debt
+
+- [ ] Consolidate UI control logic
+- [ ] Promote volume control library to first class crate
 
 ### Completed ✓
 

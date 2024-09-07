@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use events::AppEvent;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -15,6 +16,7 @@ use tauri::WindowBuilder;
 
 mod config;
 mod event_listeners;
+mod events;
 mod logger;
 mod serial;
 mod volume_manager;
@@ -57,7 +59,9 @@ fn read_continuous_serial(window: Window) -> () {
                 volume_manager::set_session_volume(&session.name, new_volume.abs());
 
                 window.show().unwrap();
-                window.emit("volume-change", format!("{}:{}", &session.name, new_volume)).unwrap();
+                window
+                    .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", &session.name, new_volume))
+                    .unwrap();
             }
         };
 
@@ -88,7 +92,7 @@ fn emit_initial_volumes(window: Window) {
 
     for session in &sessions {
         window
-            .emit("volume-change", format!("{}:{}", session.name, session.volume))
+            .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", session.name, session.volume))
             .unwrap();
     }
 }
@@ -154,7 +158,7 @@ fn toggle_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_window("mixer_window") {
         log::info!("Toggling window");
         let is_visible = window.is_visible().unwrap();
-        window.emit("visibility_change", !is_visible).unwrap();
+        window.emit(AppEvent::MixerVisibilityChange.as_str(), !is_visible).unwrap();
     } else {
         log::info!("Creating new window");
         create_new_window(app);
@@ -180,7 +184,7 @@ fn create_new_window(app: &tauri::AppHandle) {
     // in 50ms, show the window
     std::thread::spawn(move || {
         std::thread::sleep(std::time::Duration::from_millis(50));
-        mixer_window_clone2.emit("visibility_change", true).unwrap();
+        mixer_window_clone2.emit(AppEvent::MixerVisibilityChange.as_str(), true).unwrap();
     });
 
     mixer_window.on_window_event(move |event| match event {
@@ -190,7 +194,7 @@ fn create_new_window(app: &tauri::AppHandle) {
             } else {
                 let last_time = *last_focus_time.lock().unwrap();
                 if last_time.elapsed() > Duration::from_millis(100) {
-                    mixer_window_clone.emit("visibility_change", false).unwrap();
+                    mixer_window_clone.emit(AppEvent::MixerVisibilityChange.as_str(), false).unwrap();
                 }
             }
         }

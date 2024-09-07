@@ -1,4 +1,5 @@
-import { listen } from "@tauri-apps/api/event";
+import { AppEvent, listenToEvent } from "@/utils/events";
+import { debug } from "@/utils/logger";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useEffect, useState } from "react";
 import SpeakerIcon from "./SpeakerIcon";
@@ -7,17 +8,17 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
   const [volume, setVolume] = useState(Math.abs(props.volume));
   const [mute, setMute] = useState(props.volume < 0);
 
-  console.log(`VolumeControl: ${props.sessionName} ${props.volume}`);
+  debug(`VolumeControl: ${props.sessionName} ${props.volume}`);
 
   useEffect(() => {
-    const unlisten = listen<String>(`volume-change`, (event) => {
-      const [process, volume] = event.payload.split(":");
+    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: string) => {
+      const [process, volume] = payload.split(":");
 
       if (process !== props.sessionName) {
         return;
       }
 
-      console.debug(`Volume change event: ${event.payload}`);
+      debug(`Volume change event: ${payload}`);
 
       setVolume(Math.abs(Number(volume)));
       setMute(Number(volume) < 0);
