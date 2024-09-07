@@ -3,7 +3,8 @@ import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
-import SpeakerIcon from "./components/SpeakerIcon";
+import VolumeControl from "./components/VolumeControl";
+import { debug } from "./logger";
 import "./styles.css";
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -18,7 +19,7 @@ window.addEventListener("keydown", async (e) => {
 });
 
 const VolumeOverlay = () => {
-  const [process, setProcess] = useState("master");
+  const [sessionName, setSessionName] = useState("master");
   const [volume, setVolume] = useState(0);
   const [mute, setMute] = useState(false);
 
@@ -34,7 +35,9 @@ const VolumeOverlay = () => {
 
       const [processName, volume] = event.payload.split(":");
 
-      setProcess(processName);
+      debug(`Volume change event: ${event.payload}`);
+
+      setSessionName(processName);
       setVolume(Math.abs(Number(volume)));
       setMute(Number(volume) < 0);
 
@@ -57,36 +60,6 @@ const VolumeOverlay = () => {
     }, 1500);
   }
 
-  async function updateVolume(newVolume: number) {
-    if (newVolume === volume) {
-      console.debug("Volume is the same, returning");
-      return;
-    }
-    setVolume(newVolume);
-    try {
-      await invoke("set_session_volume", { sessionName: process, volume: newVolume });
-    } catch (error) {
-      console.error("Error setting volume", error);
-    }
-
-    console.debug("New volume is", newVolume);
-  }
-
-  const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const volume = Number(event.target.value);
-    updateVolume(volume);
-  };
-
-  const handleButtonClick = async () => {
-    setMute(!mute);
-    try {
-      console.log("Setting mute", process, mute);
-      await invoke("toggle_session_mute", { sessionName: process });
-    } catch (error) {
-      console.error("Error setting mute", error);
-    }
-  };
-
   resetHideTimeout();
 
   return (
@@ -97,24 +70,7 @@ const VolumeOverlay = () => {
       onMouseUp={resetHideTimeout}
       onMouseOver={resetHideTimeout}
     >
-      <h1 className="flex justify-center capitalize font-semibold text-md">{process}</h1>
-      <div className="flex flex-row items-center px-4">
-        <button
-          className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-200 rounded-md"
-          onClick={() => handleButtonClick()}
-        >
-          <SpeakerIcon volume={volume} mute={mute} className="h-4 w-4" />
-        </button>
-        <input
-          type="range"
-          min={0}
-          max="100"
-          value={volume}
-          className={`range range-xs ${mute ? "range-error" : "range-primary"}`}
-          onChange={handleSliderChange}
-        />
-        <h2 className="text-lg w-12 text-center">{volume}</h2>
-      </div>
+      <VolumeControl sessionName={sessionName} volume={volume} icon={null} />
     </div>
   );
 };

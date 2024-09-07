@@ -4,7 +4,7 @@ import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@taur
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
-import { warn } from "./logger";
+import { debug } from "./logger";
 import "./styles.css";
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -12,8 +12,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 listen<Boolean>(`visibility_change`, (event) => {
-  // warn(`Visibility change event: ${event.payload}`);
-
   const visible = event.payload;
 
   if (visible) {
@@ -39,6 +37,15 @@ class SessionData {
 const VolumeMixerPanel = () => {
   const [sessions, setSessions] = useState<SessionData[]>([]);
 
+  useEffect(() => {
+    fetchSessions();
+  }, []);
+
+  useEffect(() => {
+    debug(`Sessions changed`);
+    setWindowSizeAndPosition();
+  }, [sessions]);
+
   const fetchSessions = async () => {
     const rawSessions = await invoke("get_all_sessions");
     const sessionsArray = Object.entries(rawSessions as []);
@@ -46,11 +53,10 @@ const VolumeMixerPanel = () => {
     const sessions = new Array<SessionData>();
 
     sessionsArray.forEach((session) => {
-      // warn(`Session: ${JSON.stringify(session)}`);
       sessions.push(new SessionData(session[1]));
     });
 
-    warn(`Sessions: ${JSON.stringify(sessions)}`);
+    debug(`Sessions: ${JSON.stringify(sessions)}`);
 
     sessions.sort((a, b) => {
       if (a.name.toLowerCase() === "master") return -1;
@@ -61,52 +67,34 @@ const VolumeMixerPanel = () => {
     setSessions(sessions);
   };
 
-  useEffect(() => {
-    fetchSessions();
-
-    const unlistenFocus = appWindow.onFocusChanged((event) => {
-      warn(`Focus change event: ${event.payload}`);
-      if (event) {
-        fetchSessions();
-      }
-    });
-
-    return () => {
-      unlistenFocus.then((unlisten) => unlisten());
-    };
-  }, []);
-
   const setWindowSizeAndPosition = async () => {
     const monitor = await currentMonitor();
 
     let screenWidth = monitor!.size.width;
     let screenHeight = monitor!.size.height;
 
-    // Arbitrary values, need to compute intelligently
     let scaleFactor = monitor!.scaleFactor;
     let windowWidth = Math.round(300 * scaleFactor);
-    let windowHeight = Math.round(sessions.length * 92 * scaleFactor);
 
-    // info(`Setting window size: ${windowWidth} ${windowHeight}`);
+    // Calculate height based on number of sessions
+    const baseHeight = 75;
+    const padding = 20;
+    let windowHeight = Math.round((sessions.length * baseHeight + padding) * scaleFactor);
+
+    debug(`Setting window size: ${windowWidth} ${windowHeight}`);
     await appWindow.setSize(new PhysicalSize(windowWidth, windowHeight));
 
-    let x = screenWidth - windowWidth;
+    let x = screenWidth - (windowWidth + 20);
     let y = screenHeight - (windowHeight + 80);
 
-    // info(`Setting position: ${x} ${y}`);
+    debug(`Setting window position: ${x} ${y}`);
     await appWindow.setPosition(new PhysicalPosition(x, y));
-
-    appWindow.setFocus();
   };
 
-  setTimeout(() => {
-    setWindowSizeAndPosition();
-  });
-
   return (
-    <div className="flex flex-col h-screen w-screen bg-base-300">
+    <div id="container" className="flex flex-col h-screen w-screen bg-base-300 justify-center">
       {sessions.map((session) => (
-        <VolumeControl key={session.name} sessionName={session.name} volume={session.volume} />
+        <VolumeControl key={session.name} sessionName={session.name} volume={session.volume} icon={session.icon} />
       ))}
     </div>
   );
