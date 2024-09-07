@@ -1,7 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use api::event_listeners;
-use api::events::AppEvent;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -70,10 +69,13 @@ fn read_continuous_serial(window: Window) -> () {
                 current_volumes.insert(session.name.clone(), new_volume);
 
                 volume_manager::set_session_volume(&session.name, new_volume.abs());
-                if let Some(audio_session) = volume_manager::get_session(&session.name) {
+
+                let audio_sessions = volume_manager::get_sessions(&session.name);
+                for audio_session in audio_sessions {
                     api::events::emit_volume_change_event(&audio_session, &window);
-                    window.show().unwrap();
                 }
+
+                window.show().unwrap();
             }
         };
 

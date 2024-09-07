@@ -7,10 +7,10 @@ pub fn get_all_sessions() -> Vec<AudioSession> {
     return volume_manager::get_all_sessions();
 }
 
-#[tauri::command]
-pub fn get_session(session_name: &str) -> Option<AudioSession> {
-    return volume_manager::get_session(session_name);
-}
+// #[tauri::command]
+// pub fn get_sessions(session_name: &str) -> Option<AudioSession> {
+//     return volume_manager::get_sessions(session_name);
+// }
 
 #[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {

@@ -26,19 +26,6 @@ pub fn get_all_sessions() -> Vec<AudioSession> {
     }
 }
 
-pub fn get_session(session_name: &str) -> Option<AudioSession> {
-    unsafe {
-        let controller = get_audio_controller();
-        let session = controller.get_session_with_name(session_name.to_string());
-        if session.is_none() {
-            log::warn!("Get Session: No Session Found: {}", session_name);
-            return None;
-        }
-
-        return Some(AudioSession::from_session(session.unwrap()));
-    }
-}
-
 pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
         let controller = get_audio_controller();
@@ -51,6 +38,22 @@ pub fn get_session_volume(session_name: &str) -> i32 {
 
         return (session.unwrap().get_volume() * 100.0).round() as i32;
     }
+}
+
+pub fn get_sessions(session_name: &str) -> Vec<AudioSession> {
+    let controller = get_audio_controller();
+    let mut sessions;
+
+    unsafe {
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
+        }
+    }
+
+    return sessions.into_iter().map(|session| AudioSession::from_session(session)).collect();
 }
 
 pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {

@@ -11,10 +11,6 @@ pub struct AudioSession {
 }
 
 impl AudioSession {
-    pub fn new(name: String, volume: i32, mute: bool, icon: Option<String>) -> Self {
-        AudioSession { name, volume, mute, icon }
-    }
-
     pub fn from_session(session: &Box<dyn Session>) -> Self {
         unsafe {
             AudioSession {
