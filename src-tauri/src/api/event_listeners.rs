@@ -2,7 +2,7 @@ use inputbot::{KeybdKey::*, *};
 use std::{collections::HashSet, sync::Arc, thread};
 use tauri::Window;
 
-use crate::{config::get_config, events::AppEvent, volume_manager};
+use crate::{api::events::AppEvent, config::get_config, volume_manager};
 
 #[derive(Clone)]
 struct WindowWrapper(Arc<Window>);

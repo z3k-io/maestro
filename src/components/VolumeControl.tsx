@@ -1,3 +1,4 @@
+import { AudioSession } from "@/types/audioSession";
 import { Command, invokeCommand } from "@/utils/commands";
 import { AppEvent, listenToEvent } from "@/utils/events";
 import { logger } from "@/utils/logger";
@@ -11,17 +12,15 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
   logger.debug(`VolumeControl: ${props.sessionName} ${props.volume}`);
 
   useEffect(() => {
-    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: string) => {
-      const [process, volume] = payload.split(":");
-
-      if (process !== props.sessionName) {
+    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: AudioSession) => {
+      if (payload.name !== props.sessionName) {
         return;
       }
 
       logger.debug(`Volume change event: ${payload}`);
 
-      setVolume(Math.abs(Number(volume)));
-      setMute(Number(volume) < 0);
+      setVolume(Math.abs(payload.volume));
+      setMute(payload.muted);
     });
 
     return () => {

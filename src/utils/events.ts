@@ -1,3 +1,4 @@
+import { AudioSession } from "@/types/audioSession";
 import { listen } from "@tauri-apps/api/event";
 
 export enum AppEvent {
@@ -6,7 +7,7 @@ export enum AppEvent {
 }
 
 export interface EventPayloads {
-  [AppEvent.VolumeChange]: string;
+  [AppEvent.VolumeChange]: AudioSession;
   [AppEvent.MixerVisibilityChange]: boolean;
 }
 

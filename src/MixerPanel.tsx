@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
 import "./styles.css";
-import { SessionData } from "./types/sessionData";
+import { SessionData } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";

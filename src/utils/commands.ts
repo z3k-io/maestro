@@ -1,5 +1,5 @@
 import { invoke, InvokeArgs } from "@tauri-apps/api/tauri";
-import { SessionData } from "../types/sessionData";
+import { SessionData } from "../types/audioSession";
 
 export enum Command {
   GetAllSessions = "get_all_sessions",

@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use events::AppEvent;
+use api::event_listeners;
+use api::events::AppEvent;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -15,12 +16,24 @@ use tauri::Window;
 use tauri::WindowBuilder;
 
 mod config;
-mod event_listeners;
-mod events;
 mod logger;
 mod serial;
 mod volume_manager;
 mod window_manager;
+
+mod api {
+    pub mod commands;
+    pub mod event_listeners;
+    pub mod events;
+}
+
+mod utils {
+    pub mod icon_service;
+}
+
+mod models {
+    pub mod audio_session;
+}
 
 fn read_continuous_serial(window: Window) -> () {
     thread::spawn(move || {
@@ -57,11 +70,10 @@ fn read_continuous_serial(window: Window) -> () {
                 current_volumes.insert(session.name.clone(), new_volume);
 
                 volume_manager::set_session_volume(&session.name, new_volume.abs());
-
-                window.show().unwrap();
-                window
-                    .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", &session.name, new_volume))
-                    .unwrap();
+                if let Some(audio_session) = volume_manager::get_session(&session.name) {
+                    api::events::emit_volume_change_event(&audio_session, &window);
+                    window.show().unwrap();
+                }
             }
         };
 
@@ -87,15 +99,16 @@ fn blur_window(window: Window) {
     window.hide().unwrap();
 }
 
-fn emit_initial_volumes(window: Window) {
-    let sessions = volume_manager::get_all_sessions();
+// TODO: This might be dead now
+// fn emit_initial_volumes(window: Window) {
+//     let sessions = volume_manager::get_all_sessions();
 
-    for session in &sessions {
-        window
-            .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", session.name, session.volume))
-            .unwrap();
-    }
-}
+//     for session in &sessions {
+//         window
+//             .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", session.name, session.volume))
+//             .unwrap();
+//     }
+// }
 
 fn main() {
     logger::init_logger();
@@ -137,16 +150,16 @@ fn main() {
 
             read_continuous_serial(window.clone());
 
-            emit_initial_volumes(window.clone());
+            // emit_initial_volumes(window.clone());
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            volume_manager::get_session_volume,
-            volume_manager::set_session_volume,
-            volume_manager::toggle_session_mute,
-            volume_manager::get_all_sessions,
-            window_manager::apply_aero_theme,
+            api::commands::get_session_volume,
+            api::commands::set_session_volume,
+            api::commands::toggle_session_mute,
+            api::commands::get_all_sessions,
+            api::commands::apply_aero_theme,
             blur_window,
             logger::log,
         ])
@@ -158,7 +171,7 @@ fn toggle_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_window("mixer_window") {
         log::info!("Toggling window");
         let is_visible = window.is_visible().unwrap();
-        window.emit(AppEvent::MixerVisibilityChange.as_str(), !is_visible).unwrap();
+        api::events::emit_mixer_visibility_change_event(!is_visible, &window);
     } else {
         log::info!("Creating new window");
         create_new_window(app);
@@ -184,7 +197,7 @@ fn create_new_window(app: &tauri::AppHandle) {
     // in 50ms, show the window
     std::thread::spawn(move || {
         std::thread::sleep(std::time::Duration::from_millis(50));
-        mixer_window_clone2.emit(AppEvent::MixerVisibilityChange.as_str(), true).unwrap();
+        api::events::emit_mixer_visibility_change_event(true, &mixer_window_clone2);
     });
 
     mixer_window.on_window_event(move |event| match event {
@@ -194,7 +207,7 @@ fn create_new_window(app: &tauri::AppHandle) {
             } else {
                 let last_time = *last_focus_time.lock().unwrap();
                 if last_time.elapsed() > Duration::from_millis(100) {
-                    mixer_window_clone.emit(AppEvent::MixerVisibilityChange.as_str(), false).unwrap();
+                    api::events::emit_mixer_visibility_change_event(false, &mixer_window_clone);
                 }
             }
         }

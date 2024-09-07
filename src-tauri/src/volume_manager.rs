@@ -1,14 +1,7 @@
 use std::{collections::HashMap, i32::MIN};
 use windows_volume_control::{AudioController, CoinitMode};
 
-use crate::config;
-
-#[derive(serde::Serialize)]
-pub struct SessionInfo {
-    pub name: String,
-    pub volume: i32,
-    pub icon: Option<String>,
-}
+use crate::{config, models::audio_session::AudioSession};
 
 fn get_audio_controller() -> AudioController {
     unsafe {
@@ -18,35 +11,34 @@ fn get_audio_controller() -> AudioController {
     }
 }
 
-#[tauri::command]
-pub fn get_all_sessions() -> Vec<SessionInfo> {
+pub fn get_all_sessions() -> Vec<AudioSession> {
     unsafe {
         let controller = get_audio_controller();
         let sessions = controller.get_all_sessions();
-
-        let mut session_map: HashMap<String, SessionInfo> = HashMap::new();
+        let mut session_map: HashMap<String, AudioSession> = HashMap::new();
 
         for session in sessions {
-            let name = session.get_name().to_string();
-            let volume = (session.get_volume() * 100.0).round() as i32;
-            let mute = session.get_mute();
-            let volume = if mute { -volume } else { volume };
-            let pid = session.get_pid();
-
-            let icon = if pid != 0 {
-                Some(windows_icons::get_icon_base64_by_process_id(pid))
-            } else {
-                None
-            };
-
-            session_map.entry(name.clone()).or_insert(SessionInfo { name, volume, icon });
+            let audio_session = AudioSession::from_session(session);
+            session_map.entry(audio_session.name.clone()).or_insert(audio_session);
         }
 
         session_map.into_values().collect()
     }
 }
 
-#[tauri::command]
+pub fn get_session(session_name: &str) -> Option<AudioSession> {
+    unsafe {
+        let controller = get_audio_controller();
+        let session = controller.get_session_with_name(session_name.to_string());
+        if session.is_none() {
+            log::warn!("Get Session: No Session Found: {}", session_name);
+            return None;
+        }
+
+        return Some(AudioSession::from_session(session.unwrap()));
+    }
+}
+
 pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
         let controller = get_audio_controller();
@@ -61,7 +53,6 @@ pub fn get_session_volume(session_name: &str) -> i32 {
     }
 }
 
-#[tauri::command]
 pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
     if volume < 0 {
         log::error!("Volume must be between 0 and 100");
@@ -141,7 +132,6 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
     }
 }
 
-#[tauri::command]
 pub fn toggle_session_mute(session_name: &str) -> bool {
     log::info!("TOGGLE MUTE: {}", session_name);
     let mute = get_session_mute(session_name);

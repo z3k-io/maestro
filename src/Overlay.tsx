@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import SpeakerIcon from "./components/SpeakerIcon";
 import "./styles.css";
+import { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";
@@ -22,7 +23,7 @@ const VolumeOverlay = () => {
   const [sessionName, setSessionName] = useState("master");
   const [volume, setVolume] = useState(0);
   const [mute, setMute] = useState(false);
-  const [icon, _setIcon] = useState("");
+  const [icon, setIcon] = useState<string>("");
 
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -31,14 +32,13 @@ const VolumeOverlay = () => {
   }, [mute]);
 
   useEffect(() => {
-    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: string) => {
+    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: AudioSession) => {
       logger.debug(`Volume change event: ${payload}`);
 
-      const [processName, volume] = payload.split(":");
-
-      setSessionName(processName);
-      setVolume(Math.abs(Number(volume)));
-      setMute(Number(volume) < 0);
+      setSessionName(payload.name);
+      setVolume(payload.volume);
+      setMute(payload.muted);
+      setIcon(payload.icon ? `data:image/png;base64,${payload.icon}` : "/speaker-128.png");
 
       resetHideTimeout();
     });
@@ -93,8 +93,6 @@ const VolumeOverlay = () => {
     }
   };
 
-  const iconSrc = icon ? `data:image/png;base64,${icon}` : "/speaker-128.png";
-
   return (
     <div
       className="flex flex-col h-screen w-screen bg-base-300 justify-center"
@@ -105,7 +103,7 @@ const VolumeOverlay = () => {
     >
       <div className="flex flex-col items-center gap-0 bg-base-200 mx-2 p-2 rounded-md h-14 justify-center">
         <div className="flex flex-row items-center gap-2">
-          <img src={iconSrc} className="h-5 w-5 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md" />
+          <img src={icon} className="h-5 w-5 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md" />
           <button
             className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md"
             onClick={() => handleButtonClick()}
