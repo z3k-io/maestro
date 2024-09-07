@@ -1,8 +1,7 @@
-use crate::config;
-use crate::process_utils;
-
-use std::i32::MIN;
+use std::{collections::HashMap, i32::MIN};
 use windows_volume_control::{AudioController, CoinitMode};
+
+use crate::config;
 
 #[derive(serde::Serialize)]
 pub struct SessionInfo {
@@ -25,23 +24,25 @@ pub fn get_all_sessions() -> Vec<SessionInfo> {
         let controller = get_audio_controller();
         let sessions = controller.get_all_sessions();
 
-        let mut session_info: Vec<SessionInfo> = Vec::new();
+        let mut session_map: HashMap<String, SessionInfo> = HashMap::new();
+
         for session in sessions {
-            let mut volume = (session.get_volume() * 100.0).round() as i32;
+            let name = session.get_name().to_string();
+            let volume = (session.get_volume() * 100.0).round() as i32;
             let mute = session.get_mute();
-            if mute {
-                volume = volume * -1;
-            }
+            let volume = if mute { -volume } else { volume };
             let pid = session.get_pid();
-            let icon = process_utils::get_process_icon(pid);
-            session_info.push(SessionInfo {
-                name: session.get_name().to_string(),
-                volume,
-                icon,
-            });
+
+            let icon = if pid != 0 {
+                Some(windows_icons::get_icon_base64_by_process_id(pid))
+            } else {
+                None
+            };
+
+            session_map.entry(name.clone()).or_insert(SessionInfo { name, volume, icon });
         }
 
-        return session_info;
+        session_map.into_values().collect()
     }
 }
 

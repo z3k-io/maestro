@@ -1,5 +1,3 @@
-// src/main.rs
-
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::collections::HashMap;
@@ -18,7 +16,6 @@ use tauri::WindowBuilder;
 mod config;
 mod event_listeners;
 mod logger;
-mod process_utils;
 mod serial;
 mod volume_manager;
 mod window_manager;
