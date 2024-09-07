@@ -1,18 +1,18 @@
-import { invoke } from "@tauri-apps/api";
 import { appWindow } from "@tauri-apps/api/window";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import SpeakerIcon from "./components/SpeakerIcon";
 import "./styles.css";
+import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
-import { warn } from "./utils/logger";
+import { logger } from "./utils/logger";
 
-window.addEventListener("DOMContentLoaded", () => {
-  invoke("apply_aero_theme");
+window.addEventListener("DOMContentLoaded", async () => {
+  await invokeCommand(Command.ApplyAeroTheme);
 });
 
 window.addEventListener("keydown", async (e) => {
-  console.log(e.key);
+  logger.debug(e.key);
 
   e.stopPropagation();
   e.preventDefault();
@@ -22,21 +22,19 @@ const VolumeOverlay = () => {
   const [sessionName, setSessionName] = useState("master");
   const [volume, setVolume] = useState(0);
   const [mute, setMute] = useState(false);
-  const [icon, setIcon] = useState("");
+  const [icon, _setIcon] = useState("");
 
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    console.debug("Mute is", mute);
+    logger.debug(`Mute is ${mute}`);
   }, [mute]);
 
   useEffect(() => {
     const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: string) => {
-      console.debug(`Volume change event: ${payload}`);
+      logger.debug(`Volume change event: ${payload}`);
 
       const [processName, volume] = payload.split(":");
-
-      warn(`Volume change event: ${payload}`);
 
       setSessionName(processName);
       setVolume(Math.abs(Number(volume)));
@@ -51,12 +49,12 @@ const VolumeOverlay = () => {
   }, []);
 
   function resetHideTimeout() {
-    console.debug("Resetting hide timeout");
+    logger.debug("Resetting hide timeout");
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
     }
     hideTimeoutRef.current = setTimeout(() => {
-      console.debug("Hiding window");
+      logger.debug("Hiding window");
       appWindow.hide();
     }, 1500);
   }
@@ -65,18 +63,18 @@ const VolumeOverlay = () => {
 
   async function updateVolume(newVolume: number) {
     if (newVolume === volume) {
-      console.debug("Volume unchanged");
+      logger.debug("Volume unchanged");
       return;
     }
 
     setVolume(newVolume);
 
-    console.info(`Setting ${sessionName} volume to ${newVolume}`);
+    logger.info(`Setting ${sessionName} volume to ${newVolume}`);
 
     try {
-      await invoke("set_session_volume", { sessionName: sessionName, volume: newVolume });
+      await invokeCommand(Command.SetSessionVolume, { sessionName: sessionName, volume: newVolume });
     } catch (error) {
-      console.error("Error setting volume", error);
+      logger.error("Error setting volume", error);
     }
   }
 
@@ -86,12 +84,12 @@ const VolumeOverlay = () => {
   };
 
   const handleButtonClick = async () => {
-    console.info(`Toggling mute: ${sessionName} ${mute} -> ${!mute}`);
+    logger.info(`Toggling mute: ${sessionName} ${mute} -> ${!mute}`);
     setMute(!mute);
     try {
-      await invoke("toggle_session_mute", { sessionName: sessionName });
+      await invokeCommand(Command.ToggleMute, { sessionName: sessionName });
     } catch (error) {
-      console.error("Error setting mute", error);
+      logger.error("Error setting mute", error);
     }
   };
 

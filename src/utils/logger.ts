@@ -1,21 +1,25 @@
 import { invoke } from "@tauri-apps/api";
 
-export function info(message: string) {
-  invoke("log", { message: message, level: "info" });
-  console.log(message);
+export class Logger {
+  public info(message: string) {
+    invoke("log", { message: message, level: "info" });
+    console.log(message);
+  }
+
+  public debug(message: string) {
+    invoke("log", { message: message, level: "debug" });
+    console.debug(message);
+  }
+
+  public warn(message: string) {
+    invoke("log", { message: message, level: "warn" });
+    console.warn(message);
+  }
+
+  public error(message: string, error: any) {
+    invoke("log", { message: message, level: "error" });
+    console.error(message, error);
+  }
 }
 
-export function debug(message: string) {
-  invoke("log", { message: message, level: "debug" });
-  console.debug(message);
-}
-
-export function warn(message: string) {
-  invoke("log", { message: message, level: "warn" });
-  console.warn(message);
-}
-
-export function error(message: string) {
-  invoke("log", { message: message, level: "error" });
-  console.error(message);
-}
+export const logger = new Logger();

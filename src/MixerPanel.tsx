@@ -1,15 +1,15 @@
-import { invoke } from "@tauri-apps/api";
 import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
 import "./styles.css";
 import { SessionData } from "./types/sessionData";
+import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
-import { debug } from "./utils/logger";
+import { logger } from "./utils/logger";
 
 window.addEventListener("DOMContentLoaded", async () => {
-  invoke("apply_aero_theme");
+  await invokeCommand(Command.ApplyAeroTheme);
 });
 
 const VolumeMixerPanel = () => {
@@ -20,7 +20,7 @@ const VolumeMixerPanel = () => {
   }, []);
 
   useEffect(() => {
-    debug(`Sessions changed`);
+    logger.debug(`Sessions changed`);
     setWindowSizeAndPosition();
   }, [sessions]);
 
@@ -38,8 +38,8 @@ const VolumeMixerPanel = () => {
   }, []);
 
   const fetchSessions = async () => {
-    const rawSessions = await invoke("get_all_sessions");
-    const sessionsArray = Object.entries(rawSessions as []);
+    const rawSessions = await invokeCommand(Command.GetAllSessions);
+    const sessionsArray = Object.entries(rawSessions as Record<string, SessionData>);
 
     const sessions = new Array<SessionData>();
 
@@ -47,7 +47,7 @@ const VolumeMixerPanel = () => {
       sessions.push(session[1] as SessionData);
     });
 
-    debug(`Sessions: ${JSON.stringify(sessions)}`);
+    logger.debug(`Sessions: ${JSON.stringify(sessions)}`);
 
     sessions.sort((a, b) => {
       if (a.name.toLowerCase() === "master") return -1;
@@ -72,13 +72,13 @@ const VolumeMixerPanel = () => {
     const padding = 40;
     let windowHeight = Math.round((sessions.length * baseHeight + padding) * scaleFactor);
 
-    debug(`Setting window size: ${windowWidth} ${windowHeight}`);
+    logger.debug(`Setting window size: ${windowWidth} ${windowHeight}`);
     await appWindow.setSize(new PhysicalSize(windowWidth, windowHeight));
 
     let x = screenWidth - (windowWidth + 20);
     let y = screenHeight - (windowHeight + 80);
 
-    debug(`Setting window position: ${x} ${y}`);
+    logger.debug(`Setting window position: ${x} ${y}`);
     await appWindow.setPosition(new PhysicalPosition(x, y));
   };
 

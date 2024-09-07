@@ -1,6 +1,6 @@
+import { Command, invokeCommand } from "@/utils/commands";
 import { AppEvent, listenToEvent } from "@/utils/events";
-import { debug } from "@/utils/logger";
-import { invoke } from "@tauri-apps/api/tauri";
+import { logger } from "@/utils/logger";
 import { useEffect, useState } from "react";
 import SpeakerIcon from "./SpeakerIcon";
 
@@ -8,7 +8,7 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
   const [volume, setVolume] = useState(Math.abs(props.volume));
   const [mute, setMute] = useState(props.volume < 0);
 
-  debug(`VolumeControl: ${props.sessionName} ${props.volume}`);
+  logger.debug(`VolumeControl: ${props.sessionName} ${props.volume}`);
 
   useEffect(() => {
     const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: string) => {
@@ -18,7 +18,7 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
         return;
       }
 
-      debug(`Volume change event: ${payload}`);
+      logger.debug(`Volume change event: ${payload}`);
 
       setVolume(Math.abs(Number(volume)));
       setMute(Number(volume) < 0);
@@ -31,18 +31,18 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
 
   async function updateVolume(newVolume: number) {
     if (newVolume === volume) {
-      console.debug("Volume unchanged");
+      logger.debug(`Volume unchanged: ${newVolume}`);
       return;
     }
 
     setVolume(newVolume);
 
-    console.info(`Setting ${props.sessionName} volume to ${newVolume}`);
+    logger.info(`Setting ${props.sessionName} volume to ${newVolume}`);
 
     try {
-      await invoke("set_session_volume", { sessionName: props.sessionName, volume: newVolume });
+      await invokeCommand(Command.SetSessionVolume, { sessionName: props.sessionName, volume: newVolume });
     } catch (error) {
-      console.error("Error setting volume", error);
+      logger.error(`Error setting volume: ${error}`, error);
     }
   }
 
@@ -52,12 +52,12 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
   };
 
   const handleButtonClick = async () => {
-    console.info(`Toggling mute: ${props.sessionName} ${mute} -> ${!mute}`);
+    logger.info(`Toggling mute: ${props.sessionName} ${mute} -> ${!mute}`);
     setMute(!mute);
     try {
-      await invoke("toggle_session_mute", { sessionName: props.sessionName });
+      await invokeCommand(Command.ToggleMute, { sessionName: props.sessionName });
     } catch (error) {
-      console.error("Error setting mute", error);
+      logger.error(`Error setting mute: ${error}`, error);
     }
   };
 
