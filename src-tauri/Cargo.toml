@@ -1,6 +1,6 @@
 [package]
 name = "mix-monkey"
-version = "0.2.18"
+version = "0.2.19"
 description = "Desktop Audio Manager"
 authors = ["Zach Connelly"]
 edition = "2021"

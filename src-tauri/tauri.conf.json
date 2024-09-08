@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "mix-monkey",
-    "version": "0.2.18"
+    "version": "0.2.19"
   },
   "tauri": {
     "allowlist": {
@@ -58,8 +58,15 @@
       "active": true,
       "targets": "nsis",
       "identifier": "com.ccc.mixmonkey",
-      "resources": ["config.yaml", "../arduino/sketch/sketch.ino"],
-      "icon": ["icons/icon.ico", "icons/icon.icns", "icons/icon.png"]
+      "resources": [
+        "config.yaml",
+        "../arduino/sketch/sketch.ino"
+      ],
+      "icon": [
+        "icons/icon.ico",
+        "icons/icon.icns",
+        "icons/icon.png"
+      ]
     }
   }
 }
