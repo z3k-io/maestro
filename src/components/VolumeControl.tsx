@@ -5,7 +5,7 @@ import { logger } from "@/utils/logger";
 import { useEffect, useState } from "react";
 import SpeakerIcon from "./SpeakerIcon";
 
-function VolumeControl(props: { sessionName: string; volume: number; icon: string | null }) {
+function VolumeControl(props: { sessionName: string; volume: number; icon: string | undefined }) {
   const [volume, setVolume] = useState(Math.abs(props.volume));
   const [mute, setMute] = useState(props.volume < 0);
 
@@ -20,7 +20,7 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
       logger.debug(`Volume change event: ${payload}`);
 
       setVolume(Math.abs(payload.volume));
-      setMute(payload.muted);
+      setMute(payload.mute);
     });
 
     return () => {
@@ -54,7 +54,7 @@ function VolumeControl(props: { sessionName: string; volume: number; icon: strin
     logger.info(`Toggling mute: ${props.sessionName} ${mute} -> ${!mute}`);
     setMute(!mute);
     try {
-      await invokeCommand(Command.ToggleMute, { sessionName: props.sessionName });
+      await invokeCommand(Command.ToggleSessionMute, { sessionName: props.sessionName });
     } catch (error) {
       logger.error(`Error setting mute: ${error}`, error);
     }

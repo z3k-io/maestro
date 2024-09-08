@@ -1,6 +1,6 @@
 export interface AudioSession {
   name: string;
   volume: number;
-  muted: boolean;
+  mute: boolean;
   icon: string | undefined;
 }

@@ -32,6 +32,7 @@
 - [ ] Crash recovery / user alerts
 - [ ] Handle COM port changes / disconnects / reconnects
 - [ ] Auto update - ship new versions / prompt to users when release is published
+- [ ] Handle overlay size/location dynamically rather than in tauri.conf.json
 
 ### Bugs
 

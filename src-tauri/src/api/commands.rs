@@ -13,6 +13,11 @@ pub fn get_all_sessions() -> Vec<AudioSession> {
 // }
 
 #[tauri::command]
+pub fn get_session(session_name: &str) -> Option<AudioSession> {
+    return volume_manager::get_sessions(session_name).into_iter().next();
+}
+
+#[tauri::command]
 pub fn get_session_volume(session_name: &str) -> i32 {
     return volume_manager::get_session_volume(session_name);
 }

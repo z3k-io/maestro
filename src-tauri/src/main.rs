@@ -19,7 +19,6 @@ mod logger;
 mod serial;
 mod volume_manager;
 mod window_manager;
-
 mod api {
     pub mod commands;
     pub mod event_listeners;
@@ -50,10 +49,8 @@ fn read_continuous_serial(window: Window) -> () {
             for (index, new_volume) in new_volumes.enumerate() {
                 // look up session name from encoder index
                 let session = &config.sessions.iter().find(|s| s.encoder == index as u8).unwrap();
-                // let session = &config.sessions[index];
-                let new_volume: i32 = new_volume.parse::<i32>().unwrap();
-
                 let current_volume: i32 = *current_volumes.get(&session.name).unwrap();
+                let new_volume: i32 = new_volume.parse::<i32>().unwrap();
 
                 if current_volume == new_volume {
                     continue;
@@ -102,15 +99,12 @@ fn blur_window(window: Window) {
 }
 
 // TODO: This might be dead now
-// fn emit_initial_volumes(window: Window) {
-//     let sessions = volume_manager::get_all_sessions();
-
-//     for session in &sessions {
-//         window
-//             .emit(AppEvent::VolumeChange.as_str(), format!("{}:{}", session.name, session.volume))
-//             .unwrap();
-//     }
-// }
+fn emit_initial_volumes(window: Window) {
+    let sessions = volume_manager::get_all_sessions();
+    for session in &sessions {
+        api::events::emit_volume_change_event(&session, &window);
+    }
+}
 
 fn main() {
     logger::init_logger();
@@ -152,7 +146,7 @@ fn main() {
 
             read_continuous_serial(window.clone());
 
-            // emit_initial_volumes(window.clone());
+            emit_initial_volumes(window.clone());
 
             Ok(())
         })
@@ -160,6 +154,7 @@ fn main() {
             api::commands::get_session_volume,
             api::commands::set_session_volume,
             api::commands::toggle_session_mute,
+            api::commands::get_session,
             api::commands::get_all_sessions,
             api::commands::apply_aero_theme,
             blur_window,

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
 import "./styles.css";
-import { SessionData } from "./types/audioSession";
+import { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";
@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 const VolumeMixerPanel = () => {
-  const [sessions, setSessions] = useState<SessionData[]>([]);
+  const [sessions, setSessions] = useState<AudioSession[]>([]);
 
   useEffect(() => {
     fetchSessions();
@@ -38,14 +38,7 @@ const VolumeMixerPanel = () => {
   }, []);
 
   const fetchSessions = async () => {
-    const rawSessions = await invokeCommand(Command.GetAllSessions);
-    const sessionsArray = Object.entries(rawSessions as Record<string, SessionData>);
-
-    const sessions = new Array<SessionData>();
-
-    sessionsArray.forEach((session) => {
-      sessions.push(session[1] as SessionData);
-    });
+    const sessions = await invokeCommand(Command.GetAllSessions);
 
     logger.debug(`Sessions: ${JSON.stringify(sessions)}`);
 

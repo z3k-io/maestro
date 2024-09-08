@@ -28,17 +28,22 @@ const VolumeOverlay = () => {
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    logger.debug(`Mute is ${mute}`);
-  }, [mute]);
+    invokeCommand(Command.GetSession, { sessionName: sessionName }).then((session) => {
+      setSessionName(session.name);
+      setVolume(session.volume);
+      setMute(session.mute);
+      setIcon(session.icon ? `data:image/png;base64,${session.icon}` : "/speaker-128.png");
+    });
+  }, []);
 
   useEffect(() => {
-    const unlisten = listenToEvent(AppEvent.VolumeChange, (payload: AudioSession) => {
-      logger.debug(`Volume change event: ${payload}`);
+    const unlisten = listenToEvent(AppEvent.VolumeChange, (session: AudioSession) => {
+      logger.info(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
 
-      setSessionName(payload.name);
-      setVolume(payload.volume);
-      setMute(payload.muted);
-      setIcon(payload.icon ? `data:image/png;base64,${payload.icon}` : "/speaker-128.png");
+      setSessionName(session.name);
+      setVolume(session.volume);
+      setMute(session.mute);
+      setIcon(session.icon ? `data:image/png;base64,${session.icon}` : "/speaker-128.png");
 
       resetHideTimeout();
     });
@@ -87,7 +92,7 @@ const VolumeOverlay = () => {
     logger.info(`Toggling mute: ${sessionName} ${mute} -> ${!mute}`);
     setMute(!mute);
     try {
-      await invokeCommand(Command.ToggleMute, { sessionName: sessionName });
+      await invokeCommand(Command.ToggleSessionMute, { sessionName: sessionName });
     } catch (error) {
       logger.error("Error setting mute", error);
     }
@@ -95,17 +100,17 @@ const VolumeOverlay = () => {
 
   return (
     <div
-      className="flex flex-col h-screen w-screen bg-base-300 justify-center"
+      className="flex flex-col h-screen w-screen bg-base-300 justify-center align-middle"
       onMouseDown={resetHideTimeout}
       onMouseMove={resetHideTimeout}
       onMouseUp={resetHideTimeout}
       onMouseOver={resetHideTimeout}
     >
-      <div className="flex flex-col items-center gap-0 bg-base-200 mx-2 p-2 rounded-md h-14 justify-center">
+      <div className="flex items-center gap-0 mx-2 p-2 rounded-md justify-center">
         <div className="flex flex-row items-center gap-2">
-          <img src={icon} className="h-5 w-5 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md" />
+          <img src={icon} className="h-5 w-5" />
           <button
-            className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-300 rounded-md"
+            className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-100 rounded-md"
             onClick={() => handleButtonClick()}
           >
             <SpeakerIcon volume={volume} mute={mute} className="h-5 w-5" />
