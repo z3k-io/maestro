@@ -1,8 +1,8 @@
 #include <Encoder.h>
 
 const int NUM_ENCODERS = 4;
-const int DEFAULT_VOLUME = 20;   // 200 ~= 20%
-const int MAX_VOLUME = 100;      // Maximum volume value
+const int DEFAULT_VOLUME = 20;   // 20%
+const int MAX_VOLUME = 100;      // Maximum volume
 const int VOLUME_INCREMENT = 1;  // Volume change per tick
 
 const int firstEncoderPin = 2;  // First encoder pin (assumes sequential pins)

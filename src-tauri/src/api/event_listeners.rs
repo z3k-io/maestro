@@ -2,7 +2,7 @@ use inputbot::{KeybdKey::*, *};
 use std::{collections::HashSet, sync::Arc, thread};
 use tauri::Window;
 
-use crate::{config::get_config, volume_manager};
+use crate::{api::events::AppEvent, config::get_config, models::audio_session::AudioSession, volume_manager};
 
 #[derive(Clone)]
 struct WindowWrapper(Arc<Window>);
@@ -12,9 +12,9 @@ impl WindowWrapper {
         WindowWrapper(Arc::new(window))
     }
 
-    fn show_and_emit(&self, event: &str, payload: String) {
+    fn show_and_emit(&self, event: AppEvent, session: AudioSession) {
+        self.0.emit(event.as_str(), &session).unwrap();
         self.0.show().unwrap();
-        self.0.emit(event, payload).unwrap();
     }
 }
 
@@ -210,27 +210,33 @@ pub fn override_media_keys(window: Window) {
 fn handle_session_up(session_name: &str, window: WindowWrapper) {
     log::info!("Session up: {}", session_name);
     let current_vol = volume_manager::get_session_volume(session_name);
-    let updated_vol = volume_manager::set_session_volume(session_name, current_vol + 2);
+    volume_manager::set_session_volume(session_name, current_vol + 2);
 
-    let payload = format!("{}:{}", session_name, updated_vol);
-    window.show_and_emit("volume-change", payload);
+    let sessions = volume_manager::get_sessions(session_name);
+    for session in sessions {
+        window.show_and_emit(AppEvent::VolumeChange, session);
+    }
 }
 
 fn handle_session_down(session_name: &str, window: WindowWrapper) {
     log::info!("Session down: {}", session_name);
     let current_vol = volume_manager::get_session_volume(session_name);
-    let updated_vol = volume_manager::set_session_volume(session_name, current_vol - 2);
+    volume_manager::set_session_volume(session_name, current_vol - 2);
 
-    let payload = format!("{}:{}", session_name, updated_vol);
-    window.show_and_emit("volume-change", payload);
+    let sessions = volume_manager::get_sessions(session_name);
+    for session in sessions {
+        window.show_and_emit(AppEvent::VolumeChange, session);
+    }
 }
 
 fn handle_session_toggle_mute(session_name: &str, window: WindowWrapper) {
     log::info!("Session toggle mute: {}", session_name);
-    let mute = volume_manager::toggle_session_mute(session_name);
+    volume_manager::toggle_session_mute(session_name);
 
-    let payload = format!("{}:{}", session_name, mute);
-    window.show_and_emit("mute-change", payload);
+    let sessions = volume_manager::get_sessions(session_name);
+    for session in sessions {
+        window.show_and_emit(AppEvent::VolumeChange, session);
+    }
 }
 
 fn handle_action(action: &str, session_name: &str, window: WindowWrapper) {

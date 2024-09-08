@@ -11,15 +11,17 @@ tauri-build = { version = "^1.5.3", features = [] }
 [dependencies]
 serde = "^1.0.204"
 serde_yaml = "0.9.34"
-windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-control.git" }
+windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-control.git", branch = "main" }
 serialport = "4.0"
 inputbot = "0.6"
 log = "0.4"
 flexi_logger = "0.29.0"
+windows-icons = "0.1.0"
 
 [dependencies.tauri]
-version = "^1.7.1"
-features = [
+version = "^1.7"
+features = [ "window-center", "window-set-focus",
+    "window-set-size",
     "system-tray",
     "global-shortcut-all",
     "global-shortcut",
@@ -39,10 +41,10 @@ features = [
     "Win32_Media_Audio",
     "Win32_System_Threading",
     "Win32_UI_WindowsAndMessaging",
+    "Win32_Storage_FileSystem",
     "Win32_System_Com",
     "Win32_System_WindowsProgramming",
     "Win32_System_ProcessStatus",
-    "Win32_UI_WindowsAndMessaging",
     "Win32_Graphics_Gdi",
     "Win32_Graphics_CompositionSwapchain",
     "Win32_Graphics_Dwm",

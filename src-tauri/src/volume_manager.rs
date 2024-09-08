@@ -1,8 +1,7 @@
-use std::i32::MIN;
-
+use std::{collections::HashMap, i32::MIN};
 use windows_volume_control::{AudioController, CoinitMode};
 
-use crate::config;
+use crate::{config, models::audio_session::AudioSession};
 
 fn get_audio_controller() -> AudioController {
     unsafe {
@@ -12,7 +11,21 @@ fn get_audio_controller() -> AudioController {
     }
 }
 
-#[tauri::command]
+pub fn get_all_sessions() -> Vec<AudioSession> {
+    unsafe {
+        let controller = get_audio_controller();
+        let sessions = controller.get_all_sessions();
+        let mut session_map: HashMap<String, AudioSession> = HashMap::new();
+
+        for session in sessions {
+            let audio_session = AudioSession::from_session(session);
+            session_map.entry(audio_session.name.clone()).or_insert(audio_session);
+        }
+
+        session_map.into_values().collect()
+    }
+}
+
 pub fn get_session_volume(session_name: &str) -> i32 {
     unsafe {
         let controller = get_audio_controller();
@@ -27,7 +40,22 @@ pub fn get_session_volume(session_name: &str) -> i32 {
     }
 }
 
-#[tauri::command]
+pub fn get_sessions(session_name: &str) -> Vec<AudioSession> {
+    let controller = get_audio_controller();
+    let mut sessions;
+
+    unsafe {
+        if session_name.to_lowercase() == "other" {
+            sessions = controller.get_all_sessions();
+            sessions.retain(|session| !config::get_defined_session_names().contains(&session.get_name().to_lowercase()));
+        } else {
+            sessions = controller.get_all_sessions_with_name(session_name.to_string());
+        }
+    }
+
+    return sessions.into_iter().map(|session| AudioSession::from_session(session)).collect();
+}
+
 pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
     if volume < 0 {
         log::error!("Volume must be between 0 and 100");
@@ -107,7 +135,6 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
     }
 }
 
-#[tauri::command]
 pub fn toggle_session_mute(session_name: &str) -> bool {
     log::info!("TOGGLE MUTE: {}", session_name);
     let mute = get_session_mute(session_name);

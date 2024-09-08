@@ -4,7 +4,6 @@ use windows::Win32::Foundation::*;
 use windows::Win32::Graphics::Dwm::DwmExtendFrameIntoClientArea;
 use windows::Win32::UI::Controls::MARGINS;
 
-#[tauri::command]
 pub fn apply_aero_theme(window: Window) {
     if let Ok(hwnd) = window.hwnd() {
         let hwnd = HWND(hwnd.0 as *mut _);
@@ -31,10 +30,7 @@ pub fn center_window_at_top(window: &Window) {
         let y = 30; // px from top of the screen
 
         window
-            .set_position(PhysicalPosition {
-                x: x as i32,
-                y: y as i32,
-            })
+            .set_position(PhysicalPosition { x: x as i32, y: y as i32 })
             .expect("Failed to set window position");
     }
 }

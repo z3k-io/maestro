@@ -12,9 +12,12 @@
   "tauri": {
     "allowlist": {
       "window": {
-        "setPosition": true,
+        "show": true,
         "hide": true,
-        "show": true
+        "setPosition": true,
+        "setSize": true,
+        "setFocus": true,
+        "center": true
       },
       "all": false,
       "shell": {
@@ -27,7 +30,9 @@
     },
     "windows": [
       {
-        "title": "Mix Monkey",
+        "title": "Volume Overlay",
+        "url": "index-overlay.html",
+        "label": "overlay",
         "visible": false,
         "focus": false,
         "decorations": false,
@@ -37,13 +42,13 @@
         "center": true,
         "skipTaskbar": true,
         "width": 300,
-        "height": 80,
+        "height": 60,
         "x": 0,
-        "y": 50
+        "y": 30
       }
     ],
     "systemTray": {
-      "iconPath": "icons/32x32.png",
+      "iconPath": "icons/icon.ico",
       "iconAsTemplate": true
     },
     "security": {
@@ -53,17 +58,8 @@
       "active": true,
       "targets": "nsis",
       "identifier": "com.ccc.mixmonkey",
-      "resources": [
-        "config.yaml",
-        "../arduino/sketch/sketch.ino"
-      ],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
+      "resources": ["config.yaml", "../arduino/sketch/sketch.ino"],
+      "icon": ["icons/icon.ico", "icons/icon.icns", "icons/icon.png"]
     }
   }
 }
