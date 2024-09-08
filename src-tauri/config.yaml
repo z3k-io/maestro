@@ -1,17 +1,10 @@
-# Define schema for audio session to input mapping
-# Sessions may be controlled either by serial input (encoders) or key macros
+
+# Mapping of audio sessions to encoders
 # Master is a reserved session name for system volume control
 # Other is a reserved session name for all active processes not otherwise listed
 sessions:
 - name: "master"
   encoder: 0
-  keybinds:
-  - key: Ctrl+Shift+Up
-    action: VolumeUp
-  - key: Ctrl+Shift+Down
-    action: VolumeDown
-  - key: Ctrl+Shift+M
-    action: ToggleMute
 - name: "chrome"
   encoder: 1
 - name: "discord"
@@ -19,10 +12,11 @@ sessions:
 - name: "other"
   encoder: 3
 
+# Volume mixer (system tray) configs
 mixer:
   hotkey: "CommandOrControl+Shift+V"
 
-# Arduino connection config
+# Arduino connection configs
 arduino:
   com_port: COM3
   baud_rate: 9600

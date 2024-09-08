@@ -13,6 +13,7 @@ pub struct ArduinoConfig {
     pub baud_rate: u32,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct KeybindConfig {
     pub key: String,
@@ -24,6 +25,7 @@ pub struct MixerConfig {
     pub hotkey: Option<String>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize, Clone)]
 pub struct SessionConfig {
     pub name: String,
