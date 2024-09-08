@@ -19,6 +19,9 @@ sessions:
 - name: "other"
   encoder: 3
 
+mixer:
+  hotkey: "CommandOrControl+Shift+V"
+
 # Arduino connection config
 arduino:
   com_port: COM3

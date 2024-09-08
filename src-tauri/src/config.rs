@@ -20,17 +20,24 @@ pub struct KeybindConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct MixerConfig {
+    pub hotkey: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct SessionConfig {
     pub name: String,
     pub encoder: u8,
     pub keybinds: Option<Vec<KeybindConfig>>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub arduino: ArduinoConfig,
     pub sessions: Vec<SessionConfig>,
+    pub mixer: MixerConfig,
 }
+
 static CONFIG: OnceLock<Arc<Config>> = OnceLock::new();
 
 fn load_config() -> Result<Config, Box<dyn std::error::Error>> {

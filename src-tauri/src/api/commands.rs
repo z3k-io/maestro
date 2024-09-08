@@ -1,6 +1,8 @@
-use tauri::Window;
+use tauri::{AppHandle, Manager, Window};
 
 use crate::{models::audio_session::AudioSession, volume_manager, window_manager};
+
+use super::events;
 
 #[tauri::command]
 pub fn get_all_sessions() -> Vec<AudioSession> {
@@ -28,8 +30,18 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
 }
 
 #[tauri::command]
-pub fn toggle_session_mute(session_name: &str) -> bool {
-    return volume_manager::toggle_session_mute(session_name);
+pub fn toggle_session_mute(app_handle: AppHandle, session_name: &str) -> bool {
+    let muted = volume_manager::toggle_session_mute(session_name);
+
+    // Get the updated session after toggling mute
+    if let Some(updated_session) = volume_manager::get_sessions(session_name).into_iter().next() {
+        // Emit an event to all windows
+        app_handle.windows().iter().for_each(|(_, window)| {
+            events::emit_volume_change_event(&updated_session, window);
+        });
+    }
+
+    muted
 }
 
 // TODO: Unused

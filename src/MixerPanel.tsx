@@ -76,8 +76,8 @@ const VolumeMixerPanel = () => {
   };
 
   return (
-    <div id="container" className="flex flex-col h-screen w-screen bg-base-300 justify-center">
-      <h1 className="text-md font-bold py-2 px-4">Volume Mixer</h1>
+    <div id="container" className="flex flex-col h-screen w-screen bg-base-300 justify-center m-0 p-0">
+      <h1 className="text-md font-bold pb-2 px-4 m-0">Volume Mixer</h1>
       <div className="flex flex-col gap-2">
         {sessions.map((session) => (
           <VolumeControl key={session.name} sessionName={session.name} volume={session.volume} icon={session.icon} />

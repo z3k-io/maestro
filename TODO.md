@@ -33,6 +33,9 @@
 - [ ] Handle COM port changes / disconnects / reconnects
 - [ ] Auto update - ship new versions / prompt to users when release is published
 - [ ] Handle overlay size/location dynamically rather than in tauri.conf.json
+- [ ] UI
+  - [ ] Create grouped button for Icon + Speaker
+  - [ ] Consistent cursor styling on hover
 
 ### Bugs
 

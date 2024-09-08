@@ -138,5 +138,13 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
 pub fn toggle_session_mute(session_name: &str) -> bool {
     log::info!("TOGGLE MUTE: {}", session_name);
     let mute = get_session_mute(session_name);
-    return set_session_mute(session_name, !mute);
+    set_session_mute(session_name, !mute);
+
+    let audio_session = get_sessions(session_name).into_iter().next();
+    if audio_session.is_none() {
+        log::error!("Toggle Mute: No Session Found: {}", session_name);
+        return false;
+    }
+
+    return !mute;
 }

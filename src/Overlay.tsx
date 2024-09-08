@@ -1,7 +1,7 @@
 import { appWindow } from "@tauri-apps/api/window";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
-import SpeakerIcon from "./components/SpeakerIcon";
+import SessionButton from "./components/SessionButton";
 import "./styles.css";
 import { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
@@ -29,10 +29,7 @@ const VolumeOverlay = () => {
 
   useEffect(() => {
     invokeCommand(Command.GetSession, { sessionName: sessionName }).then((session) => {
-      setSessionName(session.name);
-      setVolume(session.volume);
-      setMute(session.mute);
-      setIcon(session.icon ? `data:image/png;base64,${session.icon}` : "/speaker-128.png");
+      setSession(session);
     });
   }, []);
 
@@ -40,10 +37,7 @@ const VolumeOverlay = () => {
     const unlisten = listenToEvent(AppEvent.VolumeChange, (session: AudioSession) => {
       logger.info(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
 
-      setSessionName(session.name);
-      setVolume(session.volume);
-      setMute(session.mute);
-      setIcon(session.icon ? `data:image/png;base64,${session.icon}` : "/speaker-128.png");
+      setSession(session);
 
       resetHideTimeout();
     });
@@ -52,6 +46,13 @@ const VolumeOverlay = () => {
       unlisten.then((r) => r());
     };
   }, []);
+
+  const setSession = (session: AudioSession) => {
+    setSessionName(session.name);
+    setVolume(session.volume);
+    setMute(session.mute);
+    setIcon(session.icon ? `data:image/png;base64,${session.icon}` : "/master-speaker-512.png");
+  };
 
   function resetHideTimeout() {
     logger.debug("Resetting hide timeout");
@@ -63,8 +64,6 @@ const VolumeOverlay = () => {
       appWindow.hide();
     }, 1500);
   }
-
-  resetHideTimeout();
 
   async function updateVolume(newVolume: number) {
     if (newVolume === volume) {
@@ -88,15 +87,7 @@ const VolumeOverlay = () => {
     updateVolume(volume);
   };
 
-  const handleButtonClick = async () => {
-    logger.info(`Toggling mute: ${sessionName} ${mute} -> ${!mute}`);
-    setMute(!mute);
-    try {
-      await invokeCommand(Command.ToggleSessionMute, { sessionName: sessionName });
-    } catch (error) {
-      logger.error("Error setting mute", error);
-    }
-  };
+  resetHideTimeout();
 
   return (
     <div
@@ -106,15 +97,9 @@ const VolumeOverlay = () => {
       onMouseUp={resetHideTimeout}
       onMouseOver={resetHideTimeout}
     >
-      <div className="flex items-center gap-0 mx-2 p-2 rounded-md justify-center">
+      <div className="flex items-center gap-0 m-2 rounded-md justify-center">
         <div className="flex flex-row items-center gap-2">
-          <img src={icon} className="h-5 w-5" />
-          <button
-            className="flex h-8 w-8 flex-shrink-0 justify-center items-center hover:bg-base-100 rounded-md"
-            onClick={() => handleButtonClick()}
-          >
-            <SpeakerIcon volume={volume} mute={mute} className="h-5 w-5" />
-          </button>
+          <SessionButton name={sessionName} icon={icon} volume={volume} mute={mute} />
           <input
             type="range"
             min={0}
@@ -123,7 +108,7 @@ const VolumeOverlay = () => {
             className={`range range-xs ${mute ? "range-error" : "range-primary"}`}
             onChange={handleSliderChange}
           />
-          <h2 className="text-lg w-12 text-center">{volume}</h2>
+          <h2 className="text-lg w-12 text-center cursor-default">{volume}</h2>
         </div>
       </div>
     </div>

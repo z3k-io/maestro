@@ -5,17 +5,17 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
-use tauri::App;
 use tauri::CustomMenuItem;
+use tauri::GlobalShortcutManager;
 use tauri::Manager;
 use tauri::SystemTray;
 use tauri::SystemTrayEvent;
 use tauri::SystemTrayMenu;
 use tauri::Window;
 use tauri::WindowBuilder;
+use tauri::{App, AppHandle};
 
 mod config;
-mod logger;
 mod serial;
 mod volume_manager;
 mod window_manager;
@@ -27,6 +27,7 @@ mod api {
 
 mod utils {
     pub mod icon_service;
+    pub mod logger;
 }
 
 mod models {
@@ -106,8 +107,17 @@ fn emit_initial_volumes(window: Window) {
     }
 }
 
+fn register_hotkey(app: &AppHandle, hotkey: &str) {
+    let app_handle = app.clone();
+    app.global_shortcut_manager()
+        .register(hotkey, move || {
+            toggle_window(&app_handle);
+        })
+        .unwrap_or_else(|e| log::error!("Failed to register hotkey: {}", e));
+}
+
 fn main() {
-    logger::init_logger();
+    utils::logger::init_logger();
 
     let open_console = CustomMenuItem::new("show_logs".to_string(), "Open Logs");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -128,7 +138,7 @@ fn main() {
                     }
                     "show_logs" => {
                         log::info!("Opening log file");
-                        logger::open_log_file();
+                        utils::logger::open_log_file();
                     }
                     _ => {}
                 },
@@ -148,6 +158,17 @@ fn main() {
 
             emit_initial_volumes(window.clone());
 
+            // Read hotkey from config
+            let config = config::get_config();
+            let hotkey = config
+                .mixer
+                .hotkey
+                .clone()
+                .unwrap_or_else(|| "CommandOrControl+Shift+M".to_string());
+
+            // Register the hotkey
+            register_hotkey(&app.handle(), &hotkey);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -158,7 +179,7 @@ fn main() {
             api::commands::get_all_sessions,
             api::commands::apply_aero_theme,
             blur_window,
-            logger::log,
+            utils::logger::log,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
