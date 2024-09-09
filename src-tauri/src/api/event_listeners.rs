@@ -15,9 +15,10 @@ use crate::{
     api::{self, events::AppEvent},
     config::get_config,
     models::audio_session::AudioSession,
+    utils::keyboard,
     volume_manager, window_manager,
 };
-use inputbot::KeybdKey::{VolumeDownKey, VolumeMuteKey, VolumeUpKey};
+use inputbot::KeybdKey::{self, VolumeDownKey, VolumeMuteKey, VolumeUpKey};
 
 #[derive(Clone)]
 struct WindowWrapper(Arc<Window>);
@@ -50,11 +51,15 @@ impl HotkeyState {
     }
 }
 
+// TODO: We are currently doublely listening to media keys, the global hotkey library supports key press and release
+// which we need to handle a press and hold correctly, however it doesnt work for full screened apps. We also use inputbot
+// which works for full screened apps, but doesn't support key release events. Hence the redundancy for now...
+
 pub fn initialize(tx: Sender<HotKey>, window: Window, app: AppHandle) {
     let window = WindowWrapper::new(window);
     register_media_key_listeners(tx, window.clone());
     register_mixer_hotkey(&app);
-    override_media_keys(window.clone());
+    override_media_keys(window.clone(), app.clone());
 }
 
 fn register_media_key_listeners(tx: Sender<HotKey>, window: WindowWrapper) {
@@ -193,7 +198,55 @@ fn register_mixer_hotkey(app: &AppHandle) {
     }
 }
 
-fn override_media_keys(window: WindowWrapper) {
+fn override_media_keys(window: WindowWrapper, app: AppHandle) {
+    log::info!("Initializing key listeners");
+
+    let config = get_config();
+
+    // Parse all key chords from config once
+    // let parsed_keybinds: Vec<(HashSet<KeybdKey>, String, String)> = config
+    //     .sessions
+    //     .iter()
+    //     .flat_map(|session| {
+    //         session.keybinds.iter().flat_map(|keybinds| {
+    //             keybinds.iter().filter_map(|keybind| {
+    //                 let chord = keyboard::parse_key_chord(&keybind.key);
+    //                 if !chord.is_empty() {
+    //                     Some((chord, keybind.action.clone(), session.name.clone()))
+    //                 } else {
+    //                     None
+    //                 }
+    //             })
+    //         })
+    //     })
+    //     .collect();
+
+    let hotkey = config.mixer.hotkey.clone();
+    let chord = keyboard::parse_key_chord(&hotkey.unwrap());
+
+    // Custom key bindings from config
+    KeybdKey::bind_all({
+        // let window = window.clone();
+        // let parsed_keybinds = parsed_keybinds.clone();
+        move |event| {
+            if !chord.is_empty() {
+                if chord.contains(&event) && keyboard::is_chord_pressed(&chord) {
+                    log::info!("Matched key chord: {:?}", chord);
+                    toggle_window(&app);
+                }
+            }
+
+            // if !keyboard::is_modifier_key(event) {
+            //     for (chord, action, session_name) in &parsed_keybinds {
+            //         if chord.contains(&event) && keyboard::is_chord_pressed(chord) {
+            //             log::info!("Matched key chord: {:?}", chord);
+            //             handle_action(action, session_name, window.clone());
+            //         }
+            //     }
+            // }
+        }
+    });
+
     // Hard-coded media key overrides
     VolumeUpKey.block_bind({
         let window = window.clone();
@@ -217,6 +270,10 @@ fn override_media_keys(window: WindowWrapper) {
             log::debug!("[MEDIA KEY] Mute");
             handle_session_toggle_mute("master", window.clone());
         }
+    });
+
+    thread::spawn(move || {
+        inputbot::handle_input_events();
     });
 }
 
@@ -262,3 +319,12 @@ fn handle_session_toggle_mute(session_name: &str, window: WindowWrapper) {
         window.show_and_emit(AppEvent::VolumeChange, session);
     }
 }
+
+// fn handle_action(action: &str, session_name: &str, window: WindowWrapper) {
+//     match action {
+//         "VolumeUp" => handle_session_up(session_name, window),
+//         "VolumeDown" => handle_session_down(session_name, window),
+//         "ToggleMute" => handle_session_toggle_mute(session_name, window),
+//         _ => log::warn!("Unknown action: {}", action),
+//     }
+// }

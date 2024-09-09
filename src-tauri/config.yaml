@@ -14,7 +14,7 @@ sessions:
 
 # Volume mixer (system tray) configs
 mixer:
-  hotkey: "CommandOrControl+Shift+V"
+  hotkey: "Ctrl+Shift+M"
 
 # Arduino connection configs
 arduino:

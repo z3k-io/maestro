@@ -27,6 +27,7 @@ mod api {
 
 mod utils {
     pub mod icon_service;
+    pub mod keyboard;
     pub mod logger;
 }
 
