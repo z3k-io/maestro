@@ -17,6 +17,7 @@ use crate::{
     models::audio_session::AudioSession,
     volume_manager, window_manager,
 };
+use inputbot::KeybdKey::{VolumeDownKey, VolumeMuteKey, VolumeUpKey};
 
 #[derive(Clone)]
 struct WindowWrapper(Arc<Window>);
@@ -50,14 +51,16 @@ impl HotkeyState {
 }
 
 pub fn initialize(tx: Sender<HotKey>, window: Window, app: AppHandle) {
-    register_media_key_listeners(tx, window);
+    let window = WindowWrapper::new(window);
+    register_media_key_listeners(tx, window.clone());
     register_mixer_hotkey(&app);
+    override_media_keys(window.clone());
 }
 
-pub fn register_media_key_listeners(tx: Sender<HotKey>, window: Window) {
+fn register_media_key_listeners(tx: Sender<HotKey>, window: WindowWrapper) {
     log::warn!("Registering hotkeys");
 
-    let window = WindowWrapper::new(window);
+    // let window = WindowWrapper::new(window);
     let hotkey_state = Arc::new(HotkeyState::new());
 
     // Need to register hotkeys with all the different modifier combinations
@@ -188,6 +191,33 @@ fn register_mixer_hotkey(app: &AppHandle) {
             })
             .unwrap_or_else(|e| log::error!("Failed to register hotkey: {}", e));
     }
+}
+
+fn override_media_keys(window: WindowWrapper) {
+    // Hard-coded media key overrides
+    VolumeUpKey.block_bind({
+        let window = window.clone();
+        move || {
+            log::debug!("[MEDIA KEY] Volume Up");
+            handle_session_up("master", window.clone());
+        }
+    });
+
+    VolumeDownKey.block_bind({
+        let window = window.clone();
+        move || {
+            log::debug!("[MEDIA KEY] Volume down");
+            handle_session_down("master", window.clone());
+        }
+    });
+
+    VolumeMuteKey.block_bind({
+        let window = window.clone();
+        move || {
+            log::debug!("[MEDIA KEY] Mute");
+            handle_session_toggle_mute("master", window.clone());
+        }
+    });
 }
 
 fn toggle_window(app: &AppHandle) {

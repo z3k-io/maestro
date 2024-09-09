@@ -83,14 +83,6 @@ fn read_continuous_serial(window: Window) -> () {
     });
 }
 
-// TODO: This might be dead now
-fn emit_initial_volumes(window: Window) {
-    let sessions = volume_manager::get_all_sessions();
-    for session in &sessions {
-        api::events::emit_volume_change_event(&session, &window);
-    }
-}
-
 fn main() {
     utils::logger::init_logger();
 
@@ -155,8 +147,6 @@ fn init_tauri(tx: mpsc::Sender<HotKey>) {
             event_listeners::initialize(tx, window.clone(), app.handle().clone());
 
             read_continuous_serial(window.clone());
-
-            emit_initial_volumes(window.clone());
 
             Ok(())
         })

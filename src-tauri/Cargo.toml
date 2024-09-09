@@ -13,6 +13,7 @@ serde = "^1.0.204"
 serde_yaml = "0.9.34"
 windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-control.git", branch = "main" }
 serialport = "4.0"
+inputbot = "0.6"
 log = "0.4"
 flexi_logger = "0.29.0"
 windows-icons = "0.1.0"
