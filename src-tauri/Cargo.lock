@@ -2269,7 +2269,7 @@ dependencies = [
 
 [[package]]
 name = "mix-monkey"
-version = "0.2.19"
+version = "0.3.0"
 dependencies = [
  "flexi_logger",
  "global-hotkey",
