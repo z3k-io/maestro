@@ -98,6 +98,9 @@ pub fn parse_key_chord(chord: &str) -> HashSet<KeybdKey> {
             "backslash" => Some(KeybdKey::BackslashKey),
             "lbracket" => Some(KeybdKey::LBracketKey),
             "rbracket" => Some(KeybdKey::RBracketKey),
+            "volumemute" => Some(KeybdKey::VolumeMuteKey),
+            "volumedown" => Some(KeybdKey::VolumeDownKey),
+            "volumeup" => Some(KeybdKey::VolumeUpKey),
 
             // Add more mappings as needed
             _ => {

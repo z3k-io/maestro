@@ -1,4 +1,4 @@
-import { appWindow } from "@tauri-apps/api/window";
+import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import SessionButton from "./components/SessionButton";
@@ -7,10 +7,6 @@ import { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";
-
-window.addEventListener("DOMContentLoaded", async () => {
-  await invokeCommand(Command.ApplyAeroTheme);
-});
 
 window.addEventListener("keydown", async (e) => {
   logger.debug(e.key);
@@ -31,11 +27,36 @@ const VolumeOverlay = () => {
     invokeCommand(Command.GetSession, { sessionName: sessionName }).then((session) => {
       setSession(session);
     });
+
+    const initWindow = async () => {
+      let window = getCurrentWindow();
+      let monitor = await currentMonitor();
+
+      if (!monitor) {
+        logger.error("No monitor found");
+        return;
+      }
+
+      let scaleFactor = monitor.scaleFactor;
+
+      let width = 300 * scaleFactor;
+      let height = 60 * scaleFactor;
+
+      let x = Math.round((monitor.size.width - width) / 2);
+      let y = Math.round(20 * scaleFactor);
+
+      logger.debug(`Setting window size to ${width}x${height}, location to ${x}, ${y}`);
+
+      window.setSize(new PhysicalSize(width, height));
+      window.setPosition(new PhysicalPosition(x, y));
+    };
+
+    initWindow();
   }, []);
 
   useEffect(() => {
     const unlisten = listenToEvent(AppEvent.VolumeChange, (session: AudioSession) => {
-      logger.debug(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
+      logger.info(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
 
       setSession(session);
 
@@ -61,8 +82,8 @@ const VolumeOverlay = () => {
     }
     hideTimeoutRef.current = setTimeout(() => {
       logger.debug("Hiding window");
-      appWindow.hide();
-    }, 1500);
+      getCurrentWindow().hide();
+    }, 1000);
   }
 
   async function updateVolume(newVolume: number) {

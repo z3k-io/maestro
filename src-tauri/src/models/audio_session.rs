@@ -1,6 +1,6 @@
 use windows_volume_control::session::Session;
 
-use crate::utils::icon_service;
+use crate::services::icon_service;
 
 #[derive(serde::Serialize)]
 pub struct AudioSession {

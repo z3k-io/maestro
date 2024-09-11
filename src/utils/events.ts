@@ -1,5 +1,5 @@
-import { AudioSession } from "@/types/audioSession";
 import { listen } from "@tauri-apps/api/event";
+import { AudioSession } from "../types/audioSession";
 
 export enum AppEvent {
   VolumeChange = "volume-change-event",

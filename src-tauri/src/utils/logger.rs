@@ -2,22 +2,7 @@ use flexi_logger::{DeferredNow, Duplicate, FileSpec, Logger, WriteMode};
 use log::Record;
 use std::{io::Write, process::Command};
 
-#[tauri::command]
-pub fn log(message: String, level: &str) {
-    match level {
-        "debug" => log::debug!("UI: {}", message),
-        "info" => log::info!("UI: {}", message),
-        "warn" => log::warn!("UI: {}", message),
-        "error" => log::error!("UI: {}", message),
-        _ => log::info!("UI: {}", message),
-    }
-}
-
-pub fn open_log_file() {
-    Command::new("explorer").arg("logs").spawn().unwrap();
-}
-
-pub fn init_logger() {
+pub fn init() {
     let format = |write: &mut dyn Write, now: &mut DeferredNow, record: &Record| {
         let level = record.level();
         let color_code = match level {
@@ -47,4 +32,18 @@ pub fn init_logger() {
         .duplicate_to_stdout(Duplicate::All)
         .start()
         .unwrap();
+}
+
+pub fn open_log_file() {
+    Command::new("explorer").arg("logs").spawn().unwrap();
+}
+
+pub fn log(message: String, level: &str) {
+    match level {
+        "debug" => log::debug!("UI: {}", message),
+        "info" => log::info!("UI: {}", message),
+        "warn" => log::warn!("UI: {}", message),
+        "error" => log::error!("UI: {}", message),
+        _ => log::info!("UI: {}", message),
+    }
 }

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, i32::MIN};
 use windows_volume_control::{AudioController, CoinitMode};
 
-use crate::{config, models::audio_session::AudioSession};
+use crate::{api::commands::get_session, config, models::audio_session::AudioSession};
 
 fn get_audio_controller() -> AudioController {
     unsafe {
@@ -56,14 +56,14 @@ pub fn get_sessions(session_name: &str) -> Vec<AudioSession> {
     return sessions.into_iter().map(|session| AudioSession::from_session(session)).collect();
 }
 
-pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
+pub fn set_session_volume(session_name: &str, volume: i32) -> Option<AudioSession> {
     if volume < 0 {
         log::error!("Volume must be between 0 and 100");
-        return 0;
+        return None;
     }
     if volume > 100 {
         log::error!("Volume must be between 0 and 100");
-        return 100;
+        return None;
     }
 
     let new_volume = volume as f32 / 100.0;
@@ -81,7 +81,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
 
         if sessions.is_empty() {
             log::warn!("Set Volume: No Session Found: {}", session_name);
-            return MIN;
+            return None;
         }
 
         for session in sessions {
@@ -90,7 +90,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> i32 {
         }
     }
 
-    return volume;
+    return get_session(session_name);
 }
 
 #[tauri::command]
@@ -135,16 +135,12 @@ pub fn set_session_mute(session_name: &str, mute: bool) -> bool {
     }
 }
 
-pub fn toggle_session_mute(session_name: &str) -> bool {
+pub fn toggle_session_mute(session_name: &str) -> AudioSession {
     log::info!("TOGGLE MUTE: {}", session_name);
     let mute = get_session_mute(session_name);
     set_session_mute(session_name, !mute);
 
     let audio_session = get_sessions(session_name).into_iter().next();
-    if audio_session.is_none() {
-        log::error!("Toggle Mute: No Session Found: {}", session_name);
-        return false;
-    }
 
-    return !mute;
+    return audio_session.expect("No Session Found");
 }

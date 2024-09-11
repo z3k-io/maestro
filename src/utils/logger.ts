@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 export class Logger {
   public info(message: string) {
@@ -16,7 +16,7 @@ export class Logger {
     console.warn(message);
   }
 
-  public error(message: string, error: any) {
+  public error(message: string, error?: any) {
     invoke("log", { message: message, level: "error" });
     console.error(message, error);
   }

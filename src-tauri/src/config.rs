@@ -2,11 +2,6 @@ use serde::Deserialize;
 use std::sync::Arc;
 use std::{fs::File, io::Read, sync::OnceLock};
 
-// TODO: Make this work automagically, shouldn't need to manually change for debugger.
-
-const CONFIG_PATH: &'static str = "config.yaml";
-// const CONFIG_PATH: &'static str = "src-tauri/config.yaml";
-
 #[derive(Debug, Deserialize, Clone)]
 pub struct ArduinoConfig {
     pub com_port: String,
@@ -43,10 +38,11 @@ pub struct Config {
 static CONFIG: OnceLock<Arc<Config>> = OnceLock::new();
 
 fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
-    log::info!("Current working directory: {:?}", std::env::current_dir()?);
-    log::info!("Loading config from: {}", CONFIG_PATH);
+    let file_path = std::env::current_dir()?.join("config.yaml");
 
-    let mut file = File::open(CONFIG_PATH)?;
+    log::info!("Loading config from: {}", file_path.to_str().unwrap());
+
+    let mut file = File::open(file_path)?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -72,10 +68,6 @@ pub fn get_defined_session_names() -> Vec<String> {
 
 pub fn get_config() -> Arc<Config> {
     CONFIG
-        .get_or_init(|| {
-            let config = load_config().expect("Failed to load config");
-            log::info!("Loaded config: {:?}", config);
-            Arc::new(config)
-        })
+        .get_or_init(|| Arc::new(load_config().expect("Failed to load config")))
         .clone()
 }

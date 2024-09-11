@@ -1,4 +1,4 @@
-import { appWindow, currentMonitor, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
+import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import VolumeControl from "./components/VolumeControl";
@@ -7,10 +7,6 @@ import { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";
-
-window.addEventListener("DOMContentLoaded", async () => {
-  await invokeCommand(Command.ApplyAeroTheme);
-});
 
 const VolumeMixerPanel = () => {
   const [sessions, setSessions] = useState<AudioSession[]>([]);
@@ -26,6 +22,7 @@ const VolumeMixerPanel = () => {
 
   useEffect(() => {
     listenToEvent(AppEvent.MixerVisibilityChange, async (visible: boolean) => {
+      const appWindow = getCurrentWindow();
       if (visible) {
         await fetchSessions();
 
@@ -42,7 +39,7 @@ const VolumeMixerPanel = () => {
 
     logger.debug(`Sessions: ${JSON.stringify(sessions)}`);
 
-    sessions.sort((a, b) => {
+    sessions.sort((a: AudioSession, b: AudioSession) => {
       if (a.name.toLowerCase() === "master") return -1;
       if (b.name.toLowerCase() === "master") return 1;
       return a.name.localeCompare(b.name);
@@ -53,6 +50,7 @@ const VolumeMixerPanel = () => {
 
   const setWindowSizeAndPosition = async () => {
     const monitor = await currentMonitor();
+    const appWindow = getCurrentWindow();
 
     let screenWidth = monitor!.size.width;
     let screenHeight = monitor!.size.height;

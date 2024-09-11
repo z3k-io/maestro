@@ -1,72 +1,21 @@
 {
+  "productName": "mix-monkey",
+  "version": "0.1.0",
+  "identifier": "com.mix-monkey.app",
   "build": {
     "beforeDevCommand": "bun run dev",
+    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "bun run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "mix-monkey",
-    "version": "0.3.1"
-  },
-  "tauri": {
-    "allowlist": {
-      "window": {
-        "show": true,
-        "hide": true,
-        "setPosition": true,
-        "setSize": true,
-        "setFocus": true,
-        "center": true
-      },
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "globalShortcut": {
-        "all": true
-      }
-    },
-    "windows": [
-      {
-        "title": "Volume Overlay",
-        "url": "index-overlay.html",
-        "label": "overlay",
-        "visible": false,
-        "focus": false,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "resizable": false,
-        "center": true,
-        "skipTaskbar": true,
-        "width": 300,
-        "height": 60,
-        "x": 0,
-        "y": 30
-      }
-    ],
-    "systemTray": {
-      "iconPath": "icons/icon.ico",
-      "iconAsTemplate": true
-    },
+  "app": {
     "security": {
       "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "nsis",
-      "identifier": "com.ccc.mixmonkey",
-      "resources": [
-        "config.yaml",
-        "../arduino/sketch/sketch.ino"
-      ],
-      "icon": [
-        "icons/icon.ico",
-        "icons/icon.icns",
-        "icons/icon.png"
-      ]
     }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "nsis",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
   }
 }
