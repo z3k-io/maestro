@@ -1,5 +1,3 @@
-use std::{thread, time::Duration};
-
 use services::{com_service, window_service};
 use utils::macro_listener;
 
