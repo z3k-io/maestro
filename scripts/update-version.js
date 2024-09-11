@@ -43,7 +43,7 @@ const updateAppVersion = (type) => {
 
   // Update tauri.conf.json
   const tauriConfig = JSON.parse(fs.readFileSync(tauriConfigPath, "utf8"));
-  tauriConfig.package.version = newVersion;
+  tauriConfig.version = newVersion;
   fs.writeFileSync(tauriConfigPath, JSON.stringify(tauriConfig, null, 2));
 
   // Update Cargo.toml
