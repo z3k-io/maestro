@@ -59,6 +59,4 @@ pub fn run() {
     }) {
         log::error!("Application crashed: {:?}", e);
     }
-
-    thread::sleep(Duration::from_secs(10));
 }
