@@ -1,6 +1,6 @@
 {
   "productName": "mix-monkey",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "identifier": "com.mix-monkey.app",
   "build": {
     "beforeDevCommand": "bun run dev",
@@ -16,7 +16,9 @@
   "bundle": {
     "active": true,
     "targets": "nsis",
-    "resources": ["config.yaml"],
+    "resources": [
+      "config.yaml"
+    ],
     "icon": [
       "speaker.png",
       "speaker-32.png",
