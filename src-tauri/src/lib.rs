@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 use services::{com_service, window_service};
 use utils::macro_listener;
 
@@ -23,32 +25,40 @@ mod models {
 }
 
 pub fn run() {
-    utils::logger::init();
+    if let Err(e) = std::panic::catch_unwind(|| {
+        utils::logger::init();
 
-    tauri::Builder::default()
-        .setup(|app| {
-            let handle = app.handle();
+        log::info!("Mix Monkey v{}", env!("CARGO_PKG_VERSION"));
 
-            window_service::create_overlay(handle.clone());
-            window_service::create_mixer(handle.clone());
+        tauri::Builder::default()
+            .setup(|app| {
+                let handle = app.handle();
 
-            system_tray::initialize_tray(handle.clone());
+                window_service::create_overlay(handle.clone());
+                window_service::create_mixer(handle.clone());
 
-            com_service::listen_serial_input(handle.clone());
+                system_tray::initialize_tray(handle.clone());
 
-            macro_listener::initialize_key_listeners(handle.clone());
+                com_service::listen_serial_input(handle.clone());
 
-            Ok(())
-        })
-        .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![
-            api::commands::get_all_sessions,
-            api::commands::get_session,
-            api::commands::get_session_volume,
-            api::commands::set_session_volume,
-            api::commands::toggle_session_mute,
-            api::commands::log
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+                macro_listener::initialize_key_listeners(handle.clone());
+
+                Ok(())
+            })
+            .plugin(tauri_plugin_shell::init())
+            .invoke_handler(tauri::generate_handler![
+                api::commands::get_all_sessions,
+                api::commands::get_session,
+                api::commands::get_session_volume,
+                api::commands::set_session_volume,
+                api::commands::toggle_session_mute,
+                api::commands::log
+            ])
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }) {
+        log::error!("Application crashed: {:?}", e);
+    }
+
+    thread::sleep(Duration::from_secs(10));
 }

@@ -1,9 +1,12 @@
-use tauri::{
-    menu::{Menu, MenuItem}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, Listener, Manager, Wry
-};
-use std::sync::Mutex;
 use once_cell::sync::Lazy;
-use std::time::{Instant, Duration};
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
+use tauri::image::Image;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Listener, Manager, Wry,
+};
 
 use crate::{services::window_service, utils};
 
@@ -18,9 +21,11 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
         *WINDOW_LAST_HIDDEN.lock().unwrap() = Some(Instant::now());
     });
 
+    let image = Image::from_path("icons/speaker-32.png").unwrap();
+
     let _ = TrayIconBuilder::with_id("tray")
         .tooltip("Mix Monkey 🍌")
-        .icon(app_handle.default_window_icon().unwrap().clone())
+        .icon(image)
         .menu(&menu)
         .menu_on_left_click(false)
         .on_menu_event(move |app, event| match event.id.as_ref() {
@@ -41,15 +46,17 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
             {
                 let app = tray.app_handle();
                 let window = app.get_webview_window("mixer").unwrap();
-                
+
                 let grace_period = Duration::from_millis(300);
-                let should_ignore = WINDOW_LAST_HIDDEN.lock().unwrap()
+                let should_ignore = WINDOW_LAST_HIDDEN
+                    .lock()
+                    .unwrap()
                     .map_or(false, |last_hidden| last_hidden.elapsed() < grace_period);
 
                 if should_ignore {
                     log::debug!("Ignoring tray click due to recent window hide");
                     return;
-                } 
+                }
                 if window.is_visible().unwrap() {
                     log::debug!("Hiding Volume Mixer window");
                     window_service::hide_mixer(app.clone());

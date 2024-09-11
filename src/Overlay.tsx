@@ -56,7 +56,7 @@ const VolumeOverlay = () => {
 
   useEffect(() => {
     const unlisten = listenToEvent(AppEvent.VolumeChange, (session: AudioSession) => {
-      logger.info(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
+      logger.debug(`Volume change event: ${session.name} ${session.volume} ${session.mute}`);
 
       setSession(session);
 
