@@ -1,7 +1,10 @@
 use std::{
     collections::HashMap,
     io::{self},
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     thread,
     time::{Duration, Instant},
 };
@@ -26,6 +29,8 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
         let current_volumes = Arc::new(Mutex::new(current_volumes));
         let config = Arc::new(config);
         let app_handle = Arc::new(app_handle);
+
+        let is_first_run = Arc::new(AtomicBool::new(true));
 
         let on_serial_update_callback = move |data: String| {
             let new_volumes = data.trim().split("|");
@@ -56,11 +61,16 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
 
                 volume_service::set_session_volume(&session.name, new_volume.abs());
 
-                let audio_sessions = volume_service::get_sessions(&session.name);
-                for audio_session in audio_sessions {
-                    events::emit_volume_change_event(&audio_session, (*app_handle).clone());
+                if !is_first_run.load(Ordering::Relaxed) {
+                    let audio_sessions = volume_service::get_sessions(&session.name);
+                    for audio_session in audio_sessions {
+                        events::emit_volume_change_event(&audio_session, (*app_handle).clone());
+                    }
                 }
             }
+
+            // Set the flag to false after the first run
+            is_first_run.store(false, Ordering::Relaxed);
         };
 
         if let Err(e) = read_continuous(on_serial_update_callback) {
