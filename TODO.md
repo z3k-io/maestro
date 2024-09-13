@@ -40,7 +40,7 @@
 
 ### Bugs
 
-- Element focus outlines
+- Icon for arc??
 - App taking focus blocks media key event listeners
   - Preventing / reseting focus on close should avoid
 - First run slider broken / no volume set

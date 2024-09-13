@@ -1,6 +1,11 @@
 use tauri::AppHandle;
 
-use crate::{models::audio_session::AudioSession, services::volume_service, utils::logger};
+use crate::{
+    config::{self, Config},
+    models::audio_session::AudioSession,
+    services::volume_service,
+    utils::logger,
+};
 
 use super::events;
 
@@ -36,4 +41,15 @@ pub fn toggle_session_mute(app_handle: AppHandle, session_name: &str) -> bool {
     events::emit_volume_change_event(&session, app_handle);
 
     return session.mute;
+}
+
+#[tauri::command]
+pub fn get_config() -> Config {
+    let config = config::get_config();
+    return (*config).clone();
+}
+
+#[tauri::command]
+pub fn set_config(config: Config) {
+    config::set_config(config);
 }

@@ -1,8 +1,13 @@
 use services::{com_service, window_service};
+use tray::system_tray;
 use utils::macro_listener;
 
 mod config;
-mod system_tray;
+mod tray {
+    pub mod config_editor;
+    pub mod console;
+    pub mod system_tray;
+}
 mod utils {
     pub mod keyboard;
     pub mod logger;
@@ -50,7 +55,9 @@ pub fn run() {
                 api::commands::get_session_volume,
                 api::commands::set_session_volume,
                 api::commands::toggle_session_mute,
-                api::commands::log
+                api::commands::log,
+                api::commands::get_config,
+                api::commands::set_config,
             ])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");

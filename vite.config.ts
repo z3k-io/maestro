@@ -20,6 +20,7 @@ export default defineConfig(async () => ({
       input: {
         overlay: path.resolve(__dirname, "index-overlay.html"),
         mixer: path.resolve(__dirname, "index-mixer.html"),
+        configEditor: path.resolve(__dirname, "index-config-editor.html"),
       },
     },
   },

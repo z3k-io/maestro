@@ -1,6 +1,9 @@
 use flexi_logger::{DeferredNow, Duplicate, FileSpec, Logger, WriteMode};
 use log::Record;
+// use std::sync::atomic::{Ordering};
 use std::{io::Write, process::Command};
+
+// static LOG_FILE_NAME: AtomicString = AtomicString::new();
 
 pub fn init() {
     let format = |write: &mut dyn Write, now: &mut DeferredNow, record: &Record| {
@@ -24,10 +27,14 @@ pub fn init() {
         )
     };
 
+    let log_file_spec = FileSpec::default().directory("logs").basename("output").suffix("txt");
+    // Save file name to global variable
+    // LOG_FILE_NAME.store("test", Ordering::Relaxed);
+
     Logger::try_with_str("info")
         .unwrap()
         .format(format)
-        .log_to_file(FileSpec::default().directory("logs").basename("output").suffix("txt"))
+        .log_to_file(log_file_spec)
         .write_mode(WriteMode::BufferAndFlush)
         .duplicate_to_stdout(Duplicate::All)
         .start()

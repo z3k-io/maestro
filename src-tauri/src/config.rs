@@ -1,34 +1,34 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::{fs::File, io::Read, sync::OnceLock};
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ArduinoConfig {
     pub com_port: String,
     pub baud_rate: u32,
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KeybindConfig {
     pub key: String,
     pub action: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MixerConfig {
     pub hotkey: Option<String>,
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SessionConfig {
     pub name: String,
     pub encoder: u8,
     pub keybinds: Option<Vec<KeybindConfig>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub arduino: ArduinoConfig,
     pub sessions: Vec<SessionConfig>,
@@ -70,4 +70,8 @@ pub fn get_config() -> Arc<Config> {
     CONFIG
         .get_or_init(|| Arc::new(load_config().expect("Failed to load config")))
         .clone()
+}
+
+pub fn set_config(config: Config) {
+    CONFIG.set(Arc::new(config));
 }

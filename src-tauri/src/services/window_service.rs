@@ -67,6 +67,32 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
     return window;
 }
 
+pub fn create_config_editor(app: AppHandle) -> WebviewWindow {
+    let window = WebviewWindowBuilder::new(&app, "config", WebviewUrl::App("index-config-editor.html".into()))
+        .title("Mix Monkey | Config Editor")
+        .decorations(true)
+        .always_on_top(false)
+        .skip_taskbar(false)
+        .resizable(true)
+        .focused(true)
+        .visible(false)
+        .build()
+        .expect("Failed to create new window");
+
+    return window;
+}
+
+pub fn show_config_editor(app: AppHandle) {
+    let window = app.get_webview_window("config").expect("Failed to find config editor window");
+    window.show().unwrap();
+    window.set_focus().unwrap();
+}
+
+pub fn hide_config_editor(app: AppHandle) {
+    let window = app.get_webview_window("config").expect("Failed to find config editor window");
+    window.hide().unwrap();
+}
+
 pub fn show_overlay(app: AppHandle) {
     let window = app.get_webview_window("overlay").expect("Failed to find overlay window");
 
@@ -99,4 +125,8 @@ pub fn toggle_mixer(app: AppHandle) {
     } else {
         show_mixer(app);
     }
+}
+
+pub fn get_window(app: AppHandle, window_label: &str) -> Option<WebviewWindow> {
+    app.get_webview_window(window_label)
 }

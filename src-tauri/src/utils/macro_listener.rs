@@ -56,86 +56,85 @@ pub fn initialize_key_listeners(app_handle: AppHandle) {
     let hotkey_state = Arc::new(HotkeyState::new());
     let hotkey_state_clone = hotkey_state.clone();
 
-    let _ = app_handle.plugin(
-        tauri_plugin_global_shortcut::Builder::new()
-            .with_shortcuts(shortcuts)
-            .expect("Failed to initialize shortcuts")
-            .with_handler(move |app_handle, shortcut, event| {
-                log::warn!("Shortcut pressed: {}", shortcut.into_string());
-                if shortcut.id() == mixer_shortcut.unwrap().id() && event.state() == ShortcutState::Pressed {
-                    log::info!("Mixer macro pressed: {}", shortcut.into_string());
-                    window_service::toggle_mixer(app_handle.clone());
-                    return;
-                }
+    let _ = app_handle.plugin(tauri_plugin_global_shortcut::Builder::new().build());
+    // .with_shortcuts(shortcuts)
+    // .expect("Failed to initialize shortcuts")
+    // .with_handler(move |app_handle, shortcut, event| {
+    // log::warn!("Shortcut pressed: {}", shortcut.into_string());
+    // if shortcut.id() == mixer_shortcut.unwrap().id() && event.state() == ShortcutState::Pressed {
+    //     log::info!("Mixer macro pressed: {}", shortcut.into_string());
+    //     window_service::toggle_mixer(app_handle.clone());
+    //     return;
+    // }
 
-                if shortcut.id() == mute_shortcut.id() && event.state() == ShortcutState::Pressed {
-                    log::info!("Mute pressed");
-                    handle_session_toggle_mute("master", app_handle.clone());
-                    return;
-                }
+    // if shortcut.id() == mute_shortcut.id() && event.state() == ShortcutState::Pressed {
+    //     log::info!("Mute pressed");
+    //     handle_session_toggle_mute("master", app_handle.clone());
+    //     return;
+    // }
 
-                if shortcut.id() == volume_up_shortcut.id() {
-                    if event.state() == ShortcutState::Pressed {
-                        log::info!("VolumeUp Pressed");
-                        hotkey_state.volume_up_active.store(true, Ordering::SeqCst);
-                        let window_clone = app_handle.clone();
+    // if shortcut.id() == volume_up_shortcut.id() {
+    //     if event.state() == ShortcutState::Pressed {
+    //         log::info!("VolumeUp Pressed");
+    //         hotkey_state.volume_up_active.store(true, Ordering::SeqCst);
+    //         let window_clone = app_handle.clone();
 
-                        let state_clone = hotkey_state.clone();
-                        std::thread::spawn(move || {
-                            // Execute immediately for the first press
-                            handle_session_up("master", window_clone.clone());
+    //         let state_clone = hotkey_state.clone();
+    //         std::thread::spawn(move || {
+    //             // Execute immediately for the first press
+    //             handle_session_up("master", window_clone.clone());
 
-                            thread::sleep(Duration::from_millis(250));
+    //             thread::sleep(Duration::from_millis(250));
 
-                            // Incrementally execute every 25ms, following the 250ms delay
-                            while state_clone.volume_up_active.load(Ordering::SeqCst) {
-                                let elapsed = state_clone.last_volume_up_press.lock().unwrap().elapsed();
-                                if elapsed >= Duration::from_millis(250) {
-                                    handle_session_up("master", window_clone.clone());
-                                }
-                                std::thread::sleep(Duration::from_millis(25));
-                            }
-                        });
-                    }
-                    if event.state() == ShortcutState::Released {
-                        log::info!("VolumeUp Media Key Released");
-                        hotkey_state.volume_up_active.store(false, Ordering::SeqCst);
-                    }
-                    return;
-                }
+    //             // Incrementally execute every 25ms, following the 250ms delay
+    //             while state_clone.volume_up_active.load(Ordering::SeqCst) {
+    //                 let elapsed = state_clone.last_volume_up_press.lock().unwrap().elapsed();
+    //                 if elapsed >= Duration::from_millis(250) {
+    //                     handle_session_up("master", window_clone.clone());
+    //                 }
+    //                 std::thread::sleep(Duration::from_millis(25));
+    //             }
+    //         });
+    //     }
+    //     if event.state() == ShortcutState::Released {
+    //         log::info!("VolumeUp Media Key Released");
+    //         hotkey_state.volume_up_active.store(false, Ordering::SeqCst);
+    //     }
+    //     return;
+    // }
 
-                if shortcut.id() == volume_down_shortcut.id() {
-                    if event.state() == ShortcutState::Pressed {
-                        log::info!("VolumeDown Pressed");
-                        hotkey_state.volume_down_active.store(true, Ordering::SeqCst);
-                        let window_clone = app_handle.clone();
+    // if shortcut.id() == volume_down_shortcut.id() {
+    //     if event.state() == ShortcutState::Pressed {
+    //         log::info!("VolumeDown Pressed");
+    //         hotkey_state.volume_down_active.store(true, Ordering::SeqCst);
+    //         let window_clone = app_handle.clone();
 
-                        let state_clone = hotkey_state.clone();
-                        std::thread::spawn(move || {
-                            // Execute immediately for the first press
-                            handle_session_down("master", window_clone.clone());
+    //         let state_clone = hotkey_state.clone();
+    //         std::thread::spawn(move || {
+    //             // Execute immediately for the first press
+    //             handle_session_down("master", window_clone.clone());
 
-                            thread::sleep(Duration::from_millis(250));
+    //             thread::sleep(Duration::from_millis(250));
 
-                            // Incrementally execute every 25ms, following the 250ms delay
-                            while state_clone.volume_down_active.load(Ordering::SeqCst) {
-                                let elapsed = state_clone.last_volume_down_press.lock().unwrap().elapsed();
-                                if elapsed >= Duration::from_millis(250) {
-                                    handle_session_down("master", window_clone.clone());
-                                }
-                                std::thread::sleep(Duration::from_millis(25));
-                            }
-                        });
-                    }
-                    if event.state() == ShortcutState::Released {
-                        log::info!("VolumeDown Media Key Released");
-                        hotkey_state.volume_down_active.store(false, Ordering::SeqCst);
-                    }
-                }
-                return;
-            })
-            .build(),
-    );
+    //             // Incrementally execute every 25ms, following the 250ms delay
+    //             while state_clone.volume_down_active.load(Ordering::SeqCst) {
+    //                 let elapsed = state_clone.last_volume_down_press.lock().unwrap().elapsed();
+    //                 if elapsed >= Duration::from_millis(250) {
+    //                     handle_session_down("master", window_clone.clone());
+    //                 }
+    //                 std::thread::sleep(Duration::from_millis(25));
+    //             }
+    //         });
+    //     }
+    //     if event.state() == ShortcutState::Released {
+    //         log::info!("VolumeDown Media Key Released");
+    //         hotkey_state.volume_down_active.store(false, Ordering::SeqCst);
+    //     }
+    // }
+    // return;
+    // })
+    // .build(),
+    // );
 
     // Subscribe with inputbot (to work when an app is fullscreen (borderless))
 

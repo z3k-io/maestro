@@ -1,4 +1,5 @@
 import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
+import { register, ShortcutEvent } from "@tauri-apps/plugin-global-shortcut";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import SessionButton from "./components/SessionButton";
@@ -8,13 +9,6 @@ import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";
 import { logger } from "./utils/logger";
 
-window.addEventListener("keydown", async (e) => {
-  logger.debug(e.key);
-
-  e.stopPropagation();
-  e.preventDefault();
-});
-
 const VolumeOverlay = () => {
   const [sessionName, setSessionName] = useState("master");
   const [volume, setVolume] = useState(0);
@@ -22,6 +16,18 @@ const VolumeOverlay = () => {
   const [icon, setIcon] = useState<string>("");
 
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const registerShortcut = async () => {
+      await register("AudioVolumeUp", (event: ShortcutEvent) => {
+        if (event.state === "Pressed") {
+          logger.info("Shortcut triggered");
+        }
+      });
+    };
+
+    registerShortcut();
+  }, []);
 
   useEffect(() => {
     invokeCommand(Command.GetSession, { sessionName: sessionName }).then((session) => {

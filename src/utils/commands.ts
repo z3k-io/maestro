@@ -1,3 +1,4 @@
+import { Config } from "@/types/config";
 import { invoke } from "@tauri-apps/api/core";
 import { AudioSession } from "../types/audioSession";
 
@@ -6,6 +7,8 @@ export enum Command {
   GetSession = "get_session",
   SetSessionVolume = "set_session_volume",
   ToggleSessionMute = "toggle_session_mute",
+  GetConfig = "get_config",
+  SetConfig = "set_config",
 }
 
 export interface CommandArgs {
@@ -13,6 +16,8 @@ export interface CommandArgs {
   [Command.GetSession]: { sessionName: string };
   [Command.SetSessionVolume]: { sessionName: string; volume: number };
   [Command.ToggleSessionMute]: { sessionName: string };
+  [Command.GetConfig]: undefined;
+  [Command.SetConfig]: { config: string };
 }
 
 export interface CommandReturns {
@@ -20,6 +25,8 @@ export interface CommandReturns {
   [Command.GetSession]: AudioSession;
   [Command.SetSessionVolume]: void;
   [Command.ToggleSessionMute]: void;
+  [Command.GetConfig]: Config;
+  [Command.SetConfig]: void;
 }
 
 export async function invokeCommand<T extends Command>(command: T, args?: CommandArgs[T]): Promise<CommandReturns[T]> {
