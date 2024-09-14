@@ -10,8 +10,6 @@ use tauri::{
 
 use crate::{services::window_service, utils};
 
-use super::console::Console;
-
 static WINDOW_LAST_HIDDEN: Lazy<Mutex<Option<Instant>>> = Lazy::new(|| Mutex::new(None));
 
 pub fn initialize_tray(app_handle: AppHandle<Wry>) {
@@ -40,8 +38,8 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
             }
             "open_console" => {
                 log::info!("Opening console");
-                let console = Console::new();
-                console.open(app);
+                // let console = Console::new();
+                // console.open(app);
             }
             "config" => {
                 log::info!("Opening config editor");

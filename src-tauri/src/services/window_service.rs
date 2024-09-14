@@ -4,6 +4,10 @@ use std::{
     time::{Duration, Instant},
 };
 use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use windows::Win32::{
+    Foundation::RECT,
+    UI::WindowsAndMessaging::{GetSystemMetrics, SystemParametersInfoA, SM_CYSCREEN, SPI_GETWORKAREA, SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS},
+};
 
 use crate::api::events;
 
@@ -85,12 +89,6 @@ pub fn create_config_editor(app: AppHandle) -> WebviewWindow {
 pub fn show_config_editor(app: AppHandle) {
     let window = app.get_webview_window("config").expect("Failed to find config editor window");
     window.show().unwrap();
-    window.set_focus().unwrap();
-}
-
-pub fn hide_config_editor(app: AppHandle) {
-    let window = app.get_webview_window("config").expect("Failed to find config editor window");
-    window.hide().unwrap();
 }
 
 pub fn show_overlay(app: AppHandle) {
@@ -129,4 +127,21 @@ pub fn toggle_mixer(app: AppHandle) {
 
 pub fn get_window(app: AppHandle, window_label: &str) -> Option<WebviewWindow> {
     app.get_webview_window(window_label)
+}
+
+#[tauri::command]
+pub fn get_taskbar_height() -> i32 {
+    unsafe {
+        let mut work_area: RECT = std::mem::zeroed();
+        SystemParametersInfoA(
+            SPI_GETWORKAREA,
+            0,
+            Some(&mut work_area as *mut RECT as *mut _),
+            SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS(0),
+        )
+        .expect("Failed to get taskbar height");
+
+        let screen_height = GetSystemMetrics(SM_CYSCREEN);
+        screen_height - (work_area.bottom - work_area.top)
+    }
 }

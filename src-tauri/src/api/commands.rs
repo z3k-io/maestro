@@ -45,8 +45,7 @@ pub fn toggle_session_mute(app_handle: AppHandle, session_name: &str) -> bool {
 
 #[tauri::command]
 pub fn get_config() -> Config {
-    let config = config::get_config();
-    return (*config).clone();
+    return config::get_config();
 }
 
 #[tauri::command]

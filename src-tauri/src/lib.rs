@@ -4,8 +4,6 @@ use utils::macro_listener;
 
 mod config;
 mod tray {
-    pub mod config_editor;
-    pub mod console;
     pub mod system_tray;
 }
 mod utils {
@@ -42,7 +40,11 @@ pub fn run() {
 
                 system_tray::initialize_tray(handle.clone());
 
-                com_service::listen_serial_input(handle.clone());
+                if config::get_config().arduino.enabled {
+                    com_service::listen_serial_input(handle.clone());
+                } else {
+                    log::info!("Arduino not enabled");
+                }
 
                 macro_listener::initialize_key_listeners(handle.clone());
 
@@ -58,6 +60,7 @@ pub fn run() {
                 api::commands::log,
                 api::commands::get_config,
                 api::commands::set_config,
+                services::window_service::get_taskbar_height,
             ])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");

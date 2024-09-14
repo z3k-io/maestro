@@ -10,10 +10,12 @@ export interface SessionConfig {
 }
 
 export interface MixerConfig {
+  enabled: boolean;
   hotkey: string;
 }
 
 export interface ArduinoConfig {
+  enabled: boolean;
   com_port: string;
   baud_rate: number;
 }

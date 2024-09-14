@@ -9,6 +9,7 @@ export enum Command {
   ToggleSessionMute = "toggle_session_mute",
   GetConfig = "get_config",
   SetConfig = "set_config",
+  GetTaskbarHeight = "get_taskbar_height",
 }
 
 export interface CommandArgs {
@@ -17,7 +18,8 @@ export interface CommandArgs {
   [Command.SetSessionVolume]: { sessionName: string; volume: number };
   [Command.ToggleSessionMute]: { sessionName: string };
   [Command.GetConfig]: undefined;
-  [Command.SetConfig]: { config: string };
+  [Command.SetConfig]: { config: Config };
+  [Command.GetTaskbarHeight]: undefined;
 }
 
 export interface CommandReturns {
@@ -27,6 +29,7 @@ export interface CommandReturns {
   [Command.ToggleSessionMute]: void;
   [Command.GetConfig]: Config;
   [Command.SetConfig]: void;
+  [Command.GetTaskbarHeight]: number;
 }
 
 export async function invokeCommand<T extends Command>(command: T, args?: CommandArgs[T]): Promise<CommandReturns[T]> {
