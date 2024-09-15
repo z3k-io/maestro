@@ -23,7 +23,7 @@ flexi_logger = "0.29.0"
 log = "0.4.22"
 once_cell = "1.18.0"
 windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-control.git", branch = "main" }
-windows-icons = "0.1.0"
+windows-icons = "0.1.1"
 serialport = "4.0"
 tauri-plugin-global-shortcut = "2.0.0-rc"
 inputbot = "0.6.0"

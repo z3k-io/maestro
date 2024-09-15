@@ -40,11 +40,7 @@ pub fn run() {
 
                 system_tray::initialize_tray(handle.clone());
 
-                if config::get_config().arduino.enabled {
-                    com_service::listen_serial_input(handle.clone());
-                } else {
-                    log::info!("Arduino not enabled");
-                }
+                com_service::listen_serial_input(handle.clone());
 
                 macro_listener::initialize_key_listeners(handle.clone());
 

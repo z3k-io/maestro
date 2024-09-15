@@ -7,10 +7,10 @@ sessions:
   - name: master
     encoder: 0
     keybinds: ~
-  - name: chrome
+  - name: arc
     encoder: 1
     keybinds: ~
-  - name: discord
+  - name: chrome
     encoder: 2
     keybinds: ~
   - name: other

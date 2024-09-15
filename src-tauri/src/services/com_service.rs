@@ -3,6 +3,7 @@ use std::{
     io::{self},
     sync::{
         atomic::{AtomicBool, Ordering},
+        mpsc::{channel, Receiver},
         Arc, Mutex,
     },
     thread,
@@ -10,25 +11,28 @@ use std::{
 };
 
 use crate::{api::events, config};
-use tauri::AppHandle;
+use tauri::{AppHandle, Listener};
 
 use super::volume_service;
 
 const DEBOUNCE_INTERVAL: Duration = Duration::from_millis(50);
 
+enum ThreadCommand {
+    Reset,
+}
+
 pub fn listen_serial_input(app_handle: AppHandle) -> () {
     thread::spawn(move || {
-        let config = config::get_config();
-
         let mut current_volumes: HashMap<String, i32> = HashMap::new();
 
-        for session in &config.sessions {
+        for session in &config::get_config().sessions {
             current_volumes.insert(session.name.clone(), 0);
         }
 
         let current_volumes = Arc::new(Mutex::new(current_volumes));
-        let config = Arc::new(config);
+        // let config = Arc::new(config);
         let app_handle = Arc::new(app_handle);
+        let app_handle_clone = app_handle.clone();
 
         let is_first_run = Arc::new(AtomicBool::new(true));
 
@@ -36,10 +40,16 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
             let new_volumes = data.trim().split("|");
             let mut current_volumes = current_volumes.lock().unwrap();
 
+            let config = config::get_config();
+
             for (index, new_volume) in new_volumes.enumerate() {
                 // look up session name from encoder index
-                let session = &config.sessions.iter().find(|s| s.encoder == index as u8).unwrap();
-                let current_volume: i32 = *current_volumes.get(&session.name).unwrap();
+                let session = &config
+                    .sessions
+                    .iter()
+                    .find(|s| s.encoder == index as u8)
+                    .expect(&format!("Failed to find session for encoder index: {}", index));
+                let current_volume: i32 = *current_volumes.get(&session.name).unwrap_or(&0);
 
                 let new_volume: i32 = new_volume
                     .trim()
@@ -73,13 +83,22 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
             is_first_run.store(false, Ordering::Relaxed);
         };
 
-        if let Err(e) = read_continuous(on_serial_update_callback) {
-            log::info!("Error reading from serial port: {}", e);
-        }
+        let (tx, rx) = channel();
+
+        app_handle_clone.listen("config_changed", move |_| {
+            log::info!("Config changed, resetting serial input listener");
+            let _ = tx.send(ThreadCommand::Reset);
+        });
+
+        thread::spawn(move || {
+            if let Err(e) = read_continuous(on_serial_update_callback, rx) {
+                log::info!("Error reading from serial port: {}", e);
+            }
+        });
     });
 }
 
-fn read_continuous<F>(mut callback: F) -> io::Result<()>
+fn read_continuous<F>(mut callback: F, rx: Receiver<ThreadCommand>) -> io::Result<()>
 where
     F: FnMut(String) + Send + 'static,
 {
@@ -98,6 +117,20 @@ where
     let mut last_invoke_time = Instant::now();
 
     loop {
+        if let Ok(command) = rx.try_recv() {
+            match command {
+                ThreadCommand::Reset => {
+                    drop(serial_port);
+
+                    serial_port = open_serial_port()?;
+                    buffer.clear();
+                    last_invoke_time = Instant::now();
+                    log::info!("Serial port reset successfully");
+                    continue;
+                }
+            }
+        }
+
         let mut serial_buf: Vec<u8> = vec![0; 32];
         match serial_port.read(serial_buf.as_mut_slice()) {
             Ok(t) => {
@@ -125,4 +158,16 @@ where
         // Small sleep to prevent busy-waiting
         thread::sleep(Duration::from_millis(1));
     }
+}
+
+fn open_serial_port() -> io::Result<Box<dyn serialport::SerialPort>> {
+    let config = config::get_config();
+    let com_port = config.arduino.com_port.clone();
+    let baud_rate = config.arduino.baud_rate;
+
+    log::info!("Initializing serial read, config: {:?}", config.clone());
+
+    let mut port = serialport::new(com_port, baud_rate).timeout(Duration::from_millis(10)).open()?;
+    port.write_data_terminal_ready(true)?;
+    Ok(port)
 }

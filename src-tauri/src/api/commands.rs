@@ -49,6 +49,6 @@ pub fn get_config() -> Config {
 }
 
 #[tauri::command]
-pub fn set_config(config: Config) {
-    config::set_config(config);
+pub fn set_config(config: Config, app_handle: AppHandle) {
+    config::set_config(config, &app_handle);
 }

@@ -4,6 +4,7 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use tauri::{AppHandle, Emitter};
 use yaml_rust::{Yaml, YamlEmitter, YamlLoader};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -56,7 +57,7 @@ pub fn get_config() -> Config {
     CONFIG.lock().unwrap().clone()
 }
 
-pub fn set_config(config: Config) {
+pub fn set_config(config: Config, app_handle: &AppHandle) {
     log::info!("Saving config to file: {:?}", config);
     save_config(&config).unwrap();
 
@@ -66,6 +67,8 @@ pub fn set_config(config: Config) {
     log::info!("Setting reloaded config in memory");
     let mut config_guard = CONFIG.lock().unwrap();
     *config_guard = reloaded_config;
+
+    app_handle.emit("config_changed", ()).unwrap();
 
     log::info!("Config set successfully");
 }
