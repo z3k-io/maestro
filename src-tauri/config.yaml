@@ -17,4 +17,4 @@ sessions:
     encoder: 3
     keybinds: ~
 mixer:
-  hotkey: Ctrl+Shift+M
+  hotkey: LCtrl+LShift+M

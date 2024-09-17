@@ -68,7 +68,7 @@ pub fn set_config(config: Config, app_handle: &AppHandle) {
     let mut config_guard = CONFIG.lock().unwrap();
     *config_guard = reloaded_config;
 
-    app_handle.emit("config_changed", ()).unwrap();
+    app_handle.emit("config_changed", config).unwrap();
 
     log::info!("Config set successfully");
 }
@@ -127,7 +127,6 @@ fn yaml_to_value(yaml: &Yaml) -> serde_yaml::Value {
 
 fn update_yaml_from_config(yaml: &mut Yaml, config: &Config) {
     if let Yaml::Hash(ref mut hash) = *yaml {
-        // Update each field in the YAML
         update_yaml_field(hash, "arduino", &config.arduino);
         update_yaml_field(hash, "sessions", &config.sessions);
         update_yaml_field(hash, "mixer", &config.mixer);

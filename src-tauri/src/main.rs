@@ -6,6 +6,12 @@
 // #![allow(unused_variables)]
 // #![allow(warnings)]
 
+use std::panic;
+
 fn main() {
+    panic::set_hook(Box::new(|panic_info| {
+        log::error!("Panic occurred: {:?}", panic_info);
+    }));
+
     mix_monkey_lib::run()
 }

@@ -34,7 +34,7 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
         .always_on_top(true)
         .skip_taskbar(true)
         .resizable(false)
-        .focused(true)
+        .focused(false)
         .visible(false)
         .build()
         .expect("Failed to create new window");
@@ -58,7 +58,6 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
                         if window_clone.is_visible().unwrap() {
                             log::debug!("Window focus lost -> closing");
                             window_clone.hide().unwrap();
-                            // Notify the tray that the window was just hidden
                             app_handle.emit("window_hidden", ()).unwrap();
                         }
                     });
@@ -95,7 +94,6 @@ pub fn show_overlay(app: AppHandle) {
     let window = app.get_webview_window("overlay").expect("Failed to find overlay window");
 
     window.show().unwrap();
-    window.set_focus().unwrap();
 }
 
 pub fn hide_overlay(app: AppHandle) {
@@ -107,7 +105,6 @@ pub fn show_mixer(app: AppHandle) {
     let window = app.get_webview_window("mixer").expect("Failed to find mixer window");
     events::emit_mixer_visibility_change_event(true, app);
     window.show().unwrap();
-    window.set_focus().unwrap();
 }
 
 pub fn hide_mixer(app: AppHandle) {

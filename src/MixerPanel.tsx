@@ -27,7 +27,6 @@ const VolumeMixerPanel = () => {
         await fetchSessions();
 
         appWindow.show();
-        appWindow.setFocus();
       } else {
         appWindow.hide();
       }

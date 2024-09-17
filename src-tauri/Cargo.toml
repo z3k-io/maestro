@@ -26,8 +26,10 @@ windows-volume-control = { git = "https://github.com/zmconnelly/windows-volume-c
 windows-icons = "0.1.1"
 serialport = "4.0"
 tauri-plugin-global-shortcut = "2.0.0-rc"
-inputbot = "0.6.0"
+lazy_static = "1.5"
 windows = { version = "0.58", features = [
-    "Win32_UI_WindowsAndMessaging",
     "Win32_Foundation",
+    "Win32_System_LibraryLoader",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
 ] }

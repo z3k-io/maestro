@@ -1,9 +1,6 @@
 use flexi_logger::{DeferredNow, Duplicate, FileSpec, Logger, WriteMode};
 use log::Record;
-// use std::sync::atomic::{Ordering};
 use std::{io::Write, process::Command};
-
-// static LOG_FILE_NAME: AtomicString = AtomicString::new();
 
 pub fn init() {
     let format = |write: &mut dyn Write, now: &mut DeferredNow, record: &Record| {
@@ -18,7 +15,7 @@ pub fn init() {
 
         write!(
             write,
-            "{}{} [{}] - {} - {}\x1b[0m\n", // \x1b[0m resets the color
+            "{}{} [{}] - {} - {}\x1b[0m\n",
             color_code,
             now.now().format("%Y-%m-%d %H:%M:%S"),
             level,
@@ -28,8 +25,6 @@ pub fn init() {
     };
 
     let log_file_spec = FileSpec::default().directory("logs").basename("output").suffix("txt");
-    // Save file name to global variable
-    // LOG_FILE_NAME.store("test", Ordering::Relaxed);
 
     Logger::try_with_str("info")
         .unwrap()
