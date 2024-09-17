@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Global window capabilities",
-  "windows": ["main", "mixer", "overlay", "config", "console"],
+  "windows": ["main", "mixer", "overlay", "settings", "console"],
   "permissions": [
     "shell:allow-open",
     "core:window:default",
@@ -13,8 +13,6 @@
     "core:window:allow-set-size",
     "core:window:allow-set-position",
     "core:event:allow-listen",
-    "core:event:allow-unlisten",
-    "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister"
+    "core:event:allow-unlisten"
   ]
 }

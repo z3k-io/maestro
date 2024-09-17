@@ -8,8 +8,8 @@ use windows::Win32::Foundation::{LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::Input::KeyboardAndMouse::{GetKeyNameTextW, MapVirtualKeyW, MAPVK_VK_TO_VSC};
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, SetWindowsHookExW, UnhookWindowsHookEx, HC_ACTION, HHOOK, KBDLLHOOKSTRUCT, WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP,
-    WM_SYSKEYDOWN, WM_SYSKEYUP,
+    CallNextHookEx, SetWindowsHookExA, SetWindowsHookExW, UnhookWindowsHookEx, HC_ACTION, HHOOK, KBDLLHOOKSTRUCT, WH_KEYBOARD_LL,
+    WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP,
 };
 
 use super::key::KeyChord;
@@ -67,10 +67,10 @@ fn key_code_to_string(vk_code: u32) -> String {
 }
 
 // Global hook, fires for any key press event
-unsafe extern "system" fn keyboard_hook(n_code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
+unsafe extern "system" fn keyboard_hook(code: i32, w_param: WPARAM, l_param: LPARAM) -> LRESULT {
     log::trace!("Entering hook, {} hooks", HOOKS.read().unwrap().len());
 
-    if n_code == HC_ACTION as i32 {
+    if code == HC_ACTION as i32 {
         let kb_struct = &*(l_param.0 as *const KBDLLHOOKSTRUCT);
         let vk_code = kb_struct.vkCode;
         let key_string = key_code_to_string(vk_code);
@@ -114,8 +114,8 @@ unsafe extern "system" fn keyboard_hook(n_code: i32, w_param: WPARAM, l_param: L
         }
     }
 
-    log::trace!("Exiting hook");
-    CallNextHookEx(None, n_code, w_param, l_param)
+    // Always call the next hook in the chain, regardless of whether we've handled the event
+    CallNextHookEx(None, code, w_param, l_param)
 }
 pub struct KeyListener {
     hook: SendableHHOOK,
@@ -123,8 +123,8 @@ pub struct KeyListener {
 
 impl KeyListener {
     pub fn new() -> Self {
-        let h_instance = unsafe { GetModuleHandleW(None) }.expect("Failed to get module handle");
-        let hook = unsafe { SetWindowsHookExW(WH_KEYBOARD_LL, Some(keyboard_hook), h_instance, 0) }.expect("Failed to set hook");
+        let hook = unsafe { SetWindowsHookExA(WH_KEYBOARD_LL, Some(keyboard_hook), None, 0) }.expect("Failed to set hook");
+
         KeyListener {
             hook: SendableHHOOK::new(hook),
         }

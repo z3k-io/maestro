@@ -14,13 +14,12 @@ use crate::api::events;
 pub fn create_overlay(app: AppHandle) -> WebviewWindow {
     let window = WebviewWindowBuilder::new(&app, "overlay", WebviewUrl::App("index-overlay.html".into()))
         .title("Overlay")
-        .decorations(false)
         .always_on_top(true)
         .skip_taskbar(true)
+        .decorations(false)
         .resizable(false)
         .focused(false)
         .visible(false)
-        .transparent(true)
         .build()
         .expect("Failed to create new window");
 
@@ -30,9 +29,9 @@ pub fn create_overlay(app: AppHandle) -> WebviewWindow {
 pub fn create_mixer(app: AppHandle) -> WebviewWindow {
     let window = WebviewWindowBuilder::new(&app, "mixer", WebviewUrl::App("index-mixer.html".into()))
         .title("Mixer")
-        .decorations(false)
         .always_on_top(true)
         .skip_taskbar(true)
+        .decorations(false)
         .resizable(false)
         .focused(false)
         .visible(false)
@@ -70,14 +69,14 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
     return window;
 }
 
-pub fn create_config_editor(app: AppHandle) -> WebviewWindow {
-    let window = WebviewWindowBuilder::new(&app, "config", WebviewUrl::App("index-config-editor.html".into()))
-        .title("Mix Monkey | Config Editor")
+pub fn create_settings(app: AppHandle) -> WebviewWindow {
+    let window = WebviewWindowBuilder::new(&app, "settings", WebviewUrl::App("index-settings.html".into()))
+        .title("Mix Monkey | Settings")
         .decorations(true)
-        .always_on_top(false)
-        .skip_taskbar(false)
         .resizable(true)
         .focused(true)
+        .always_on_top(true)
+        .skip_taskbar(false)
         .visible(false)
         .build()
         .expect("Failed to create new window");
@@ -85,14 +84,13 @@ pub fn create_config_editor(app: AppHandle) -> WebviewWindow {
     return window;
 }
 
-pub fn show_config_editor(app: AppHandle) {
-    let window = app.get_webview_window("config").expect("Failed to find config editor window");
+pub fn show_settings(app: AppHandle) {
+    let window = app.get_webview_window("settings").expect("Failed to find settings window");
     window.show().unwrap();
 }
 
 pub fn show_overlay(app: AppHandle) {
     let window = app.get_webview_window("overlay").expect("Failed to find overlay window");
-
     window.show().unwrap();
 }
 

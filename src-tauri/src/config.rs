@@ -22,13 +22,13 @@ pub struct KeybindConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MixerConfig {
+    pub enabled: bool,
     pub hotkey: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SessionConfig {
     pub name: String,
-    pub encoder: u8,
     pub keybinds: Option<Vec<KeybindConfig>>,
 }
 

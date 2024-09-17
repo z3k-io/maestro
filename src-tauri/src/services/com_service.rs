@@ -30,7 +30,6 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
         }
 
         let current_volumes = Arc::new(Mutex::new(current_volumes));
-        // let config = Arc::new(config);
         let app_handle = Arc::new(app_handle);
         let app_handle_clone = app_handle.clone();
 
@@ -46,9 +45,9 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
                 // look up session name from encoder index
                 let session = &config
                     .sessions
-                    .iter()
-                    .find(|s| s.encoder == index as u8)
+                    .get(index)
                     .expect(&format!("Failed to find session for encoder index: {}", index));
+
                 let current_volume: i32 = *current_volumes.get(&session.name).unwrap_or(&0);
 
                 let new_volume: i32 = new_volume

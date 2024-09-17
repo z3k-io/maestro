@@ -1,20 +1,17 @@
 ---
 arduino:
-  enabled: false
+  enabled: true
   com_port: COM3
   baud_rate: 9600
 sessions:
   - name: master
-    encoder: 0
-    keybinds: ~
-  - name: arc
-    encoder: 1
     keybinds: ~
   - name: chrome
-    encoder: 2
+    keybinds: ~
+  - name: discord
     keybinds: ~
   - name: other
-    encoder: 3
     keybinds: ~
 mixer:
-  hotkey: LCtrl+LShift+M
+  enabled: true
+  hotkey: LCtrl + LShift + M

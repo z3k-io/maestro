@@ -9,7 +9,7 @@ import { Config } from "./types/config";
 import { Command, invokeCommand } from "./utils/commands";
 import { logger } from "./utils/logger";
 
-const ConfigEditor = () => {
+const Settings = () => {
   const [config, setConfig] = useState<Config>();
   const [originalConfig, setOriginalConfig] = useState<Config>();
 
@@ -30,7 +30,7 @@ const ConfigEditor = () => {
     const screenHeight = monitor!.size.height;
 
     const windowWidth = Math.round(600 * scaleFactor);
-    const windowHeight = Math.round(620 * scaleFactor);
+    const windowHeight = Math.round(650 * scaleFactor);
     let taskbarHeight = (await invokeCommand(Command.GetTaskbarHeight)) * scaleFactor;
 
     logger.debug(`Setting window size: ${windowWidth} ${windowHeight}`);
@@ -91,7 +91,7 @@ const ConfigEditor = () => {
     logger.warn(`Saving config: ${JSON.stringify(config)}`);
     await invokeCommand(Command.SetConfig, { config: config! });
 
-    toast.success("Configs saved!", {
+    toast.success("Settings saved", {
       position: "top-center",
       autoClose: 500,
       hideProgressBar: true,
@@ -104,9 +104,9 @@ const ConfigEditor = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 bg-base-300 h-screen w-screen">
       <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-bold text-center">Config Editor</h1>
+        <h1 className="text-3xl font-bold text-center p-2 ">Settings</h1>
         <div className="flex flex-row gap-2">
           <button className="btn btn-outline btn-sm btn-info" onClick={handleReset}>
             Reset
@@ -116,15 +116,14 @@ const ConfigEditor = () => {
           </button>
         </div>
       </div>
-      <div id="sessions" className="bg-base-200 p-4 rounded-lg">
-        {/* <div id="mixer" className="flex flex-col gap-2 p-4 bg-base-200 rounded-lg"> */}
-        <h2 className="text-xl font-bold text-left">Sessions</h2>
+      <div id="sessions" className="bg-base-100 p-4 rounded-lg">
+        <h2 className="text-xl font-bold text-left">Audio Session Mapping</h2>
         <div id="sessions" className="flex flex-row gap-2 justify-evenly">
           {config?.sessions.map((session, index) => (
             <div key={index} className="flex flex-col gap-2">
               <label className="form-control w-full max-w-xs">
                 <div className="label">
-                  <span className="label-text">Name</span>
+                  <span className="label-text">Encoder ({index})</span>
                 </div>
                 <input
                   type="text"
@@ -133,24 +132,14 @@ const ConfigEditor = () => {
                   value={session.name}
                   onChange={(e) => handleSessionChange(index, "name", e.target.value)}
                 />
-
-                <div className="label">
-                  <span className="label-text">Encoder Index</span>
-                </div>
-                <input
-                  type="number"
-                  className="input input-sm input-bordered w-16 max-w-xs"
-                  value={session.encoder}
-                  onChange={(e) => handleSessionChange(index, "encoder", parseInt(e.target.value))}
-                />
               </label>
             </div>
           ))}
         </div>
       </div>
 
-      <div id="mixer" className="flex flex-col gap-2 p-4 bg-base-200 rounded-lg">
-        <h2 className="text-xl font-bold text-left">Mixer</h2>
+      <div id="mixer" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
+        <h2 className="text-xl font-bold text-left">Volume Mixer</h2>
         <div className="form-control w-52">
           <label className="label cursor-pointer">
             <span className="label-text">Enabled</span>
@@ -175,8 +164,8 @@ const ConfigEditor = () => {
           />
         </div>
       </div>
-      <div id="arduino" className="flex flex-col gap-2 p-4 bg-base-200 rounded-lg">
-        <h2 className="text-xl font-bold text-left">Arduino</h2>
+      <div id="arduino" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
+        <h2 className="text-xl font-bold text-left">Serial Connection (Arduino)</h2>
         <label className="form-control w-full max-w-xs">
           <div className="flex flex-col">
             <div className="form-control w-52">
@@ -211,7 +200,7 @@ const ConfigEditor = () => {
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ConfigEditor />
+    <Settings />
     <ToastContainer />
   </React.StrictMode>,
 );
