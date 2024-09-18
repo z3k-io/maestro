@@ -2081,6 +2081,7 @@ dependencies = [
 name = "mix-monkey"
 version = "0.4.4"
 dependencies = [
+ "dirs 5.0.1",
  "flexi_logger",
  "lazy_static",
  "log",

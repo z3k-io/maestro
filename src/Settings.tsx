@@ -30,7 +30,7 @@ const Settings = () => {
     const screenHeight = monitor!.size.height;
 
     const windowWidth = Math.round(600 * scaleFactor);
-    const windowHeight = Math.round(650 * scaleFactor);
+    const windowHeight = Math.round(750 * scaleFactor);
     let taskbarHeight = (await invokeCommand(Command.GetTaskbarHeight)) * scaleFactor;
 
     logger.debug(`Setting window size: ${windowWidth} ${windowHeight}`);
@@ -83,6 +83,13 @@ const Settings = () => {
     });
   }, []);
 
+  const handleSystemChange = useCallback((field: keyof Config["system"], value: boolean) => {
+    setConfig((prevConfig) => {
+      if (!prevConfig) return prevConfig;
+      return { ...prevConfig, system: { ...prevConfig.system, [field]: value } };
+    });
+  }, []);
+
   const handleReset = () => {
     setConfig(originalConfig);
   };
@@ -106,7 +113,7 @@ const Settings = () => {
   return (
     <div className="flex flex-col gap-4 p-4 bg-base-300 h-screen w-screen">
       <div className="flex flex-row justify-between">
-        <h1 className="text-3xl font-bold text-center p-2 ">Settings</h1>
+        <h1 className="text-3xl font-bold text-center p-2">Settings</h1>
         <div className="flex flex-row gap-2">
           <button className="btn btn-outline btn-sm btn-info" onClick={handleReset}>
             Reset
@@ -117,8 +124,8 @@ const Settings = () => {
         </div>
       </div>
       <div id="sessions" className="bg-base-100 p-4 rounded-lg">
-        <h2 className="text-xl font-bold text-left">Audio Session Mapping</h2>
-        <div id="sessions" className="flex flex-row gap-2 justify-evenly">
+        <h2 className="text-xl font-bold text-left">Audio Mapping</h2>
+        <div id="sessions" className="flex flex-row gap-2 justify-between">
           {config?.sessions.map((session, index) => (
             <div key={index} className="flex flex-col gap-2">
               <label className="form-control w-full max-w-xs">
@@ -193,6 +200,21 @@ const Settings = () => {
             </div>
           </div>
         </label>
+      </div>
+
+      <div id="system" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
+        <h2 className="text-xl font-bold text-left">System Settings</h2>
+        <div className="form-control w-52">
+          <label className="label cursor-pointer">
+            <span className="label-text">System Startup</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-primary"
+              checked={config?.system.autostart}
+              onChange={(e) => handleSystemChange("autostart", e.target.checked)}
+            />
+          </label>
+        </div>
       </div>
     </div>
   );

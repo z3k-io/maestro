@@ -2,6 +2,7 @@ export interface Config {
   sessions: SessionConfig[];
   mixer: MixerConfig;
   arduino: ArduinoConfig;
+  system: SystemConfig;
 }
 
 export interface SessionConfig {
@@ -18,4 +19,8 @@ export interface ArduinoConfig {
   enabled: boolean;
   com_port: string;
   baud_rate: number;
+}
+
+export interface SystemConfig {
+  autostart: boolean;
 }

@@ -164,7 +164,7 @@ fn open_serial_port() -> io::Result<Box<dyn serialport::SerialPort>> {
     let com_port = config.arduino.com_port.clone();
     let baud_rate = config.arduino.baud_rate;
 
-    log::info!("Initializing serial read, config: {:?}", config.clone());
+    log::info!("Initializing serial read: com_port: {:?}, baud_rate: {:?}", com_port, baud_rate);
 
     let mut port = serialport::new(com_port, baud_rate).timeout(Duration::from_millis(10)).open()?;
     port.write_data_terminal_ready(true)?;

@@ -15,3 +15,5 @@ sessions:
 mixer:
   enabled: true
   hotkey: LCtrl + LShift + M
+system:
+  autostart: true

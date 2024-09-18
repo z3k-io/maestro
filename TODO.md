@@ -36,7 +36,8 @@
 - [ ] UI
   - [ ] Create grouped button for Icon + Speaker
   - [ ] Consistent cursor styling on hover
-- [ ] https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/autostart
+- [ ] Uninstaller
+  - [ ] Cleanup autostart shortcut
 
 ### Bugs
 

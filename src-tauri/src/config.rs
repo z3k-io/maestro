@@ -27,6 +27,11 @@ pub struct MixerConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SystemConfig {
+    pub autostart: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SessionConfig {
     pub name: String,
     pub keybinds: Option<Vec<KeybindConfig>>,
@@ -37,6 +42,7 @@ pub struct Config {
     pub arduino: ArduinoConfig,
     pub sessions: Vec<SessionConfig>,
     pub mixer: MixerConfig,
+    pub system: SystemConfig,
 }
 
 static CONFIG: Lazy<Arc<Mutex<Config>>> = Lazy::new(|| Arc::new(Mutex::new(load_config())));
@@ -130,6 +136,7 @@ fn update_yaml_from_config(yaml: &mut Yaml, config: &Config) {
         update_yaml_field(hash, "arduino", &config.arduino);
         update_yaml_field(hash, "sessions", &config.sessions);
         update_yaml_field(hash, "mixer", &config.mixer);
+        update_yaml_field(hash, "system", &config.system);
     }
 }
 

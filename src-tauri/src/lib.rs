@@ -12,7 +12,7 @@ mod utils {
     pub mod key_listener;
     pub mod logger;
     pub mod macro_listener;
-    pub mod windows_startup;
+    pub mod system_manager;
 }
 mod api {
     pub mod commands;
@@ -38,8 +38,6 @@ pub fn run() {
             .setup(|app| {
                 let handle = app.handle();
 
-                app.autolaunch().enable().expect("Failed to enable autostart");
-
                 window_service::create_overlay(handle.clone());
                 window_service::create_mixer(handle.clone());
 
@@ -49,9 +47,10 @@ pub fn run() {
 
                 macro_listener::initialize_key_listeners(handle.clone());
 
+                utils::system_manager::handle_enable_autostart(handle.clone());
+
                 Ok(())
             })
-            .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec![])))
             .plugin(tauri_plugin_shell::init())
             .invoke_handler(tauri::generate_handler![
                 api::commands::get_all_sessions,
@@ -62,8 +61,7 @@ pub fn run() {
                 api::commands::log,
                 api::commands::get_config,
                 api::commands::set_config,
-                services::window_service::get_taskbar_height,
-                utils::windows_startup::toggle_startup,
+                services::window_service::get_taskbar_height
             ])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");

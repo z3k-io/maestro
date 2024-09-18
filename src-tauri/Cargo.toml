@@ -28,6 +28,7 @@ serialport = "4.0"
 tauri-plugin-autostart = "2.0.0-rc"
 lazy_static = "1.5"
 winreg = "0.52.0"
+dirs = "5.0.1"
 windows = { version = "0.58", features = [
     "Win32_Foundation",
     "Win32_System_LibraryLoader",
