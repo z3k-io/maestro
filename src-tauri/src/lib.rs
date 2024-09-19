@@ -1,9 +1,8 @@
 use services::{com_service, window_service};
-use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tray::system_tray;
-use utils::macro_listener;
+use utils::{logger, macro_listener};
 
-mod config;
+pub mod config;
 mod tray {
     pub mod system_tray;
 }
@@ -29,43 +28,43 @@ mod models {
 }
 
 pub fn run() {
-    if let Err(e) = std::panic::catch_unwind(|| {
-        utils::logger::init();
+    logger::init();
 
-        log::info!("Mix Monkey v{}", env!("CARGO_PKG_VERSION"));
+    log::info!("Mix Monkey v{}", env!("CARGO_PKG_VERSION"));
 
-        tauri::Builder::default()
-            .setup(|app| {
-                let handle = app.handle();
+    tauri::Builder::default()
+        .setup(|app| {
+            let handle = app.handle();
 
-                window_service::create_overlay(handle.clone());
-                window_service::create_mixer(handle.clone());
+            #[allow(dead_code)]
+            #[cfg(not(debug_assertions))]
+            utils::system_manager::handle_enable_autostart(handle.clone());
 
-                system_tray::initialize_tray(handle.clone());
+            utils::system_manager::handle_debug_console(handle.clone());
 
-                com_service::listen_serial_input(handle.clone());
+            window_service::create_overlay(handle.clone());
+            window_service::create_mixer(handle.clone());
 
-                macro_listener::initialize_key_listeners(handle.clone());
+            system_tray::initialize_tray(handle.clone());
 
-                utils::system_manager::handle_enable_autostart(handle.clone());
+            com_service::listen_serial_input(handle.clone());
 
-                Ok(())
-            })
-            .plugin(tauri_plugin_shell::init())
-            .invoke_handler(tauri::generate_handler![
-                api::commands::get_all_sessions,
-                api::commands::get_session,
-                api::commands::get_session_volume,
-                api::commands::set_session_volume,
-                api::commands::toggle_session_mute,
-                api::commands::log,
-                api::commands::get_config,
-                api::commands::set_config,
-                services::window_service::get_taskbar_height
-            ])
-            .run(tauri::generate_context!())
-            .expect("error while running tauri application");
-    }) {
-        log::error!("Application crashed: {:?}", e);
-    }
+            macro_listener::initialize_key_listeners(handle.clone());
+
+            Ok(())
+        })
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![
+            api::commands::get_all_sessions,
+            api::commands::get_session,
+            api::commands::get_session_volume,
+            api::commands::set_session_volume,
+            api::commands::toggle_session_mute,
+            api::commands::log,
+            api::commands::get_config,
+            api::commands::set_config,
+            services::window_service::get_taskbar_height
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }

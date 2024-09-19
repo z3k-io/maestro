@@ -9,21 +9,16 @@
   - [ ] Initialize at program start, use winAPI as source of truth
 - [ ] Config
   - [ ] Support multiple inputs for a single encoder
-  - [ ] What to show in UI
 - [ ] App Icons
   - [ ] Cache icon base64 in memory
   - [ ] How to handle mapped application that isnt running?
 - [ ] User config / settings
-  - [ ] Option in tray menu
-  - [ ] Read write / update config.yaml based on tray menu choices - just open an editor? reload on close?
   - [ ] Feature flag support
     - [ ] Theme/styling
     - [ ] Timeout for UI visible
 - [ ] Tray Menu
   - [ ] List com ports
-  - [ ] switch com
-  - [ ] restart
-  - [ ] view raw arduino logs
+  - [ ] view raw serial logs
 - [ ] Volume up should unmute
 - [ ] UI Improvements
   - [ ] Animations?
@@ -35,7 +30,6 @@
 - [ ] Handle overlay size/location dynamically rather than in tauri.conf.json
 - [ ] UI
   - [ ] Create grouped button for Icon + Speaker
-  - [ ] Consistent cursor styling on hover
 - [ ] Uninstaller
   - [ ] Cleanup autostart shortcut
 

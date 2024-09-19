@@ -113,7 +113,7 @@ const VolumeOverlay = () => {
     >
       <div className="flex items-center gap-0 m-2 rounded-md justify-center">
         <div className="flex flex-row items-center gap-2">
-          <SessionButton name={sessionName} icon={icon} volume={volume} mute={mute} />
+          <SessionButton name={sessionName} icon={icon} volume={volume} mute={mute} style="hover:bg-yellow-400" />
           <input
             type="range"
             min={0}

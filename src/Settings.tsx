@@ -30,7 +30,7 @@ const Settings = () => {
     const screenHeight = monitor!.size.height;
 
     const windowWidth = Math.round(600 * scaleFactor);
-    const windowHeight = Math.round(750 * scaleFactor);
+    const windowHeight = Math.round(800 * scaleFactor);
     let taskbarHeight = (await invokeCommand(Command.GetTaskbarHeight)) * scaleFactor;
 
     logger.debug(`Setting window size: ${windowWidth} ${windowHeight}`);
@@ -212,6 +212,15 @@ const Settings = () => {
               className="toggle toggle-primary"
               checked={config?.system.autostart}
               onChange={(e) => handleSystemChange("autostart", e.target.checked)}
+            />
+          </label>
+          <label className="label cursor-pointer">
+            <span className="label-text">Show Debug Console</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-primary"
+              checked={config?.system.show_console}
+              onChange={(e) => handleSystemChange("show_console", e.target.checked)}
             />
           </label>
         </div>

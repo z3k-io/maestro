@@ -14,11 +14,11 @@ static WINDOW_LAST_HIDDEN: Lazy<Mutex<Option<Instant>>> = Lazy::new(|| Mutex::ne
 
 pub fn initialize_tray(app_handle: AppHandle<Wry>) {
     let open_logs = MenuItem::with_id(&app_handle, "show_logs", "Logs", true, None::<&str>).unwrap();
-    let console = MenuItem::with_id(&app_handle, "open_console", "Open Console", true, None::<&str>).unwrap();
+    // let console = MenuItem::with_id(&app_handle, "open_console", "Open Console", true, None::<&str>).unwrap();
     let quit = MenuItem::with_id(&app_handle, "quit", "Quit", true, None::<&str>).unwrap();
     let settings = MenuItem::with_id(&app_handle, "settings", "Settings", true, None::<&str>).unwrap();
 
-    let menu = Menu::with_items(&app_handle, &[&open_logs, &console, &settings, &quit]).unwrap();
+    let menu = Menu::with_items(&app_handle, &[&open_logs, &settings, &quit]).unwrap();
 
     app_handle.listen("window_hidden", |_| {
         *WINDOW_LAST_HIDDEN.lock().unwrap() = Some(Instant::now());
@@ -36,11 +36,11 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
                 log::info!("Opening logs");
                 utils::logger::open_log_file();
             }
-            "open_console" => {
-                log::info!("Opening console");
-                // let console = Console::new();
-                // console.open(app);
-            }
+            // "open_console" => {
+            //     log::info!("Opening console");
+            //     // let console = Console::new();
+            //     // console.open(app);
+            // }
             "settings" => {
                 log::info!("Opening settings");
                 let window = window_service::get_window(app.clone(), "settings");

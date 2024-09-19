@@ -17,3 +17,4 @@ mixer:
   hotkey: LCtrl + LShift + M
 system:
   autostart: true
+  show_console: true

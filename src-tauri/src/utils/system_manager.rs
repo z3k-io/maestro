@@ -1,7 +1,11 @@
+#![allow(dead_code)]
+
 use crate::config::{get_config, Config};
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Listener};
+use windows::Win32::Foundation::HWND;
+use windows::Win32::System::Console::{AllocConsole, AttachConsole, FreeConsole, GetConsoleWindow, ATTACH_PARENT_PROCESS};
 
 pub fn toggle_startup(enable: bool) -> Result<(), String> {
     log::info!("Set autostart: {}", enable);
@@ -83,6 +87,42 @@ pub fn handle_enable_autostart(app_handle: AppHandle) {
                 toggle_startup(true).unwrap();
             } else {
                 toggle_startup(false).unwrap();
+            }
+        }
+    });
+}
+
+pub fn handle_debug_console(app_handle: AppHandle) {
+    let config = get_config();
+
+    unsafe {
+        if config.system.show_console {
+            // Check if the console is already attached
+            if GetConsoleWindow() == HWND(std::ptr::null_mut()) {
+                // Console is not attached, so attach it
+                AttachConsole(ATTACH_PARENT_PROCESS).unwrap_or_else(|_| {
+                    // If attaching fails, allocate a new console
+                    AllocConsole().expect("Failed to allocate console");
+                });
+            }
+        } else {
+            // Only free the console if it's attached
+            if GetConsoleWindow() != HWND(std::ptr::null_mut()) {
+                FreeConsole().expect("Failed to free console");
+            }
+        }
+    }
+
+    app_handle.listen("config_changed", move |event| {
+        if let Ok(config) = serde_json::from_str::<Config>(event.payload()) {
+            if config.system.show_console {
+                unsafe {
+                    AttachConsole(ATTACH_PARENT_PROCESS).expect("Failed to allocate console");
+                }
+            } else {
+                unsafe {
+                    FreeConsole().expect("Failed to free console");
+                }
             }
         }
     });

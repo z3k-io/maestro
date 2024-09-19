@@ -7,9 +7,10 @@ interface SessionButtonProps {
   icon: string;
   volume: number;
   mute: boolean;
+  style?: string;
 }
 
-export default function SessionButton({ name, icon, volume, mute }: SessionButtonProps) {
+export default function SessionButton({ name, icon, volume, mute, style }: SessionButtonProps) {
   const handleButtonClick = async () => {
     logger.info(`Toggling mute: ${name} ${mute} -> ${!mute}`);
 
@@ -22,7 +23,7 @@ export default function SessionButton({ name, icon, volume, mute }: SessionButto
 
   return (
     <button
-      className="relative flex h-8 w-14 flex-shrink-0 justify-between items-center rounded-md group"
+      className={`relative flex h-8 w-14 flex-shrink-0 justify-between items-center rounded-md group ${style}`}
       data-tip={name.charAt(0).toUpperCase() + name.slice(1)}
       onClick={() => handleButtonClick()}
     >

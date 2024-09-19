@@ -29,6 +29,7 @@ pub struct MixerConfig {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SystemConfig {
     pub autostart: bool,
+    pub show_console: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
