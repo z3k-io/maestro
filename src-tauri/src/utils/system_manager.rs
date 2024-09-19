@@ -93,36 +93,34 @@ pub fn handle_enable_autostart(app_handle: AppHandle) {
 }
 
 pub fn handle_debug_console(app_handle: AppHandle) {
+    unsafe fn set_debug_console(config: Config) {
+        if config.system.show_console {
+            if GetConsoleWindow() == HWND(std::ptr::null_mut()) {
+                log::info!("Console not attached, attaching");
+                let result = AttachConsole(ATTACH_PARENT_PROCESS);
+                if result.is_err() {
+                    AllocConsole().expect("Failed to allocate console");
+                } else {
+                    log::info!("Console attached successfully");
+                }
+            } else {
+                log::info!("Console already attached");
+            }
+        } else {
+            FreeConsole().expect("Failed to free console");
+        }
+    }
+
     let config = get_config();
 
     unsafe {
-        if config.system.show_console {
-            // Check if the console is already attached
-            if GetConsoleWindow() == HWND(std::ptr::null_mut()) {
-                // Console is not attached, so attach it
-                AttachConsole(ATTACH_PARENT_PROCESS).unwrap_or_else(|_| {
-                    // If attaching fails, allocate a new console
-                    AllocConsole().expect("Failed to allocate console");
-                });
-            }
-        } else {
-            // Only free the console if it's attached
-            if GetConsoleWindow() != HWND(std::ptr::null_mut()) {
-                FreeConsole().expect("Failed to free console");
-            }
-        }
+        set_debug_console(config);
     }
 
     app_handle.listen("config_changed", move |event| {
         if let Ok(config) = serde_json::from_str::<Config>(event.payload()) {
-            if config.system.show_console {
-                unsafe {
-                    AttachConsole(ATTACH_PARENT_PROCESS).expect("Failed to allocate console");
-                }
-            } else {
-                unsafe {
-                    FreeConsole().expect("Failed to free console");
-                }
+            unsafe {
+                set_debug_console(config);
             }
         }
     });

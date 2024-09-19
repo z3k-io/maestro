@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use serde_json::to_string_pretty;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -65,19 +66,19 @@ pub fn get_config() -> Config {
 }
 
 pub fn set_config(config: Config, app_handle: &AppHandle) {
-    log::info!("Saving config to file: {:?}", config);
+    let pretty_config = to_string_pretty(&config).unwrap();
+    log::info!("Saving config:\n{}", pretty_config);
+
     save_config(&config).unwrap();
 
-    log::info!("Reloading config from file");
     let reloaded_config = load_config();
 
-    log::info!("Setting reloaded config in memory");
     let mut config_guard = CONFIG.lock().unwrap();
     *config_guard = reloaded_config;
 
     app_handle.emit("config_changed", config).unwrap();
 
-    log::info!("Config set successfully");
+    log::info!("Config reload complete.");
 }
 
 fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {

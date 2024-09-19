@@ -18,7 +18,7 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
     let quit = MenuItem::with_id(&app_handle, "quit", "Quit", true, None::<&str>).unwrap();
     let settings = MenuItem::with_id(&app_handle, "settings", "Settings", true, None::<&str>).unwrap();
 
-    let menu = Menu::with_items(&app_handle, &[&open_logs, &settings, &quit]).unwrap();
+    let menu = Menu::with_items(&app_handle, &[&settings, &open_logs, &quit]).unwrap();
 
     app_handle.listen("window_hidden", |_| {
         *WINDOW_LAST_HIDDEN.lock().unwrap() = Some(Instant::now());

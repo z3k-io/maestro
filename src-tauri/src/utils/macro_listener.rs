@@ -25,7 +25,7 @@ pub fn initialize_key_listeners(app_handle: AppHandle) {
         let key_listener = key_listener.clone();
         move |event: Event| {
             if let Ok(config) = serde_json::from_str::<Config>(event.payload()) {
-                log::info!("Config changed, resetting key listeners: {:?}", config);
+                log::info!("Config changed, resetting key listeners");
                 key_listener.lock().unwrap().dispose();
                 key_listener.lock().unwrap().init();
                 register_key_listeners(app_handle.clone(), key_listener.clone(), config);
@@ -35,8 +35,6 @@ pub fn initialize_key_listeners(app_handle: AppHandle) {
 }
 
 fn register_key_listeners(app_handle: AppHandle, key_listener: Arc<Mutex<KeyListener>>, config: Config) {
-    log::info!("Registering key listeners");
-
     if config.mixer.hotkey.is_some() {
         key_listener.lock().unwrap().register(
             KeyChord::from_string(config.mixer.hotkey.unwrap().as_str()),
@@ -82,8 +80,6 @@ fn register_key_listeners(app_handle: AppHandle, key_listener: Arc<Mutex<KeyList
             }
         }),
     );
-
-    // key_listener.listen();
 }
 
 fn handle_session_toggle_mute(session_name: &str, app_handle: AppHandle) {
