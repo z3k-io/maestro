@@ -1,6 +1,6 @@
 [package]
 name = "mix-monkey"
-version = "0.4.4"
+version = "0.5.0"
 description = "Windows Audio Manager"
 authors = ["Zach Connelly"]
 edition = "2021"
