@@ -2079,7 +2079,7 @@ dependencies = [
 
 [[package]]
 name = "mix-monkey"
-version = "0.5.4"
+version = "0.5.5"
 dependencies = [
  "dirs 5.0.1",
  "flexi_logger",

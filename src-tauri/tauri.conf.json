@@ -1,6 +1,6 @@
 {
   "productName": "mix-monkey",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "identifier": "com.mix-monkey.app",
   "build": {
     "beforeDevCommand": "bun run dev",
