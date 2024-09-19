@@ -20,13 +20,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "src-tauri -> target"
-          key: ${{ runner.os }}-cargo-${{ github.ref_name }}
+          key: ${{ runner.os }}-cargo-${{ github.ref }}
 
       - name: Cache Bun dependencies
         uses: actions/cache@v3
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ github.ref_name }}
+          key: ${{ runner.os }}-bun-${{ github.ref }}
 
       - run: bun install
 
