@@ -2,7 +2,7 @@ name: Discord Release Notification
 
 on:
   release:
-    types: [published]
+    types: [created, edited, published]
 
 jobs:
   github-releases-to-discord:
