@@ -12,15 +12,14 @@ const VolumeMixerPanel = () => {
   const [sessions, setSessions] = useState<AudioSession[]>([]);
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
-
-  useEffect(() => {
     logger.debug(`Sessions changed`);
     setWindowSizeAndPosition();
   }, [sessions]);
 
   useEffect(() => {
+    fetchSessions();
+    fetchConfig();
+
     listenToEvent(AppEvent.MixerVisibilityChange, async (visible: boolean) => {
       const appWindow = getCurrentWindow();
       if (visible) {
@@ -31,12 +30,22 @@ const VolumeMixerPanel = () => {
         appWindow.hide();
       }
     });
+
+    listenToEvent(AppEvent.ThemeChange, (theme: string) => {
+      logger.info(`Theme changed to ${theme}`);
+      document.documentElement.setAttribute("data-theme", theme);
+    });
   }, []);
+
+  const fetchConfig = async () => {
+    const config = await invokeCommand(Command.GetConfig);
+    logger.warn(`Loaded config: ${JSON.stringify(config)}`);
+    let theme = config!.system.theme;
+    document.documentElement.setAttribute("data-theme", theme);
+  };
 
   const fetchSessions = async () => {
     const sessions = await invokeCommand(Command.GetAllSessions);
-
-    logger.debug(`Sessions: ${JSON.stringify(sessions)}`);
 
     sessions.sort((a: AudioSession, b: AudioSession) => {
       if (a.name.toLowerCase() === "master") return -1;

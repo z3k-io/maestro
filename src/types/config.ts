@@ -24,4 +24,5 @@ export interface ArduinoConfig {
 export interface SystemConfig {
   autostart: boolean;
   show_console: boolean;
+  theme: string;
 }

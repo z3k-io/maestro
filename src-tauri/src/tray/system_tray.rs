@@ -8,6 +8,7 @@ use tauri::{
     AppHandle, Listener, Manager, Wry,
 };
 
+use crate::api::events::AppEvent;
 use crate::{services::window_service, utils};
 
 static WINDOW_LAST_HIDDEN: Lazy<Mutex<Option<Instant>>> = Lazy::new(|| Mutex::new(None));
@@ -20,7 +21,7 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
 
     let menu = Menu::with_items(&app_handle, &[&settings, &open_logs, &quit]).unwrap();
 
-    app_handle.listen("window_hidden", |_| {
+    app_handle.listen(AppEvent::WindowHidden.as_str(), |_| {
         *WINDOW_LAST_HIDDEN.lock().unwrap() = Some(Instant::now());
     });
 

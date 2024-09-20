@@ -6,6 +6,7 @@ use tauri::Event;
 use tauri::Listener;
 
 use crate::api::events;
+use crate::api::events::AppEvent;
 use crate::config;
 use crate::config::Config;
 use crate::services::volume_service;
@@ -20,7 +21,7 @@ pub fn initialize_key_listeners(app_handle: AppHandle) {
 
     register_key_listeners(app_handle.clone(), key_listener.clone(), config::get_config());
 
-    app_handle.listen("config_changed", {
+    app_handle.listen(AppEvent::ConfigChange.as_str(), {
         let app_handle = app_handle.clone();
         let key_listener = key_listener.clone();
         move |event: Event| {

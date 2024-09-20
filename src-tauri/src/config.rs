@@ -5,8 +5,10 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Emitter};
+use tauri::AppHandle;
 use yaml_rust::{Yaml, YamlEmitter, YamlLoader};
+
+use crate::api::events::emit_config_change_event;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ArduinoConfig {
@@ -31,6 +33,7 @@ pub struct MixerConfig {
 pub struct SystemConfig {
     pub autostart: bool,
     pub show_console: bool,
+    pub theme: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -76,7 +79,7 @@ pub fn set_config(config: Config, app_handle: &AppHandle) {
     let mut config_guard = CONFIG.lock().unwrap();
     *config_guard = reloaded_config;
 
-    app_handle.emit("config_changed", config).unwrap();
+    emit_config_change_event(&config, app_handle.clone());
 
     log::info!("Config reload complete.");
 }
@@ -95,10 +98,9 @@ fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     update_yaml_from_config(yaml_config, config);
 
     let mut out_str = String::new();
-    {
-        let mut emitter = YamlEmitter::new(&mut out_str);
-        emitter.dump(yaml_config)?;
-    }
+
+    let mut emitter = YamlEmitter::new(&mut out_str);
+    emitter.dump(yaml_config)?;
 
     fs::File::create(&file_path)?.write_all(out_str.as_bytes())?;
     Ok(())

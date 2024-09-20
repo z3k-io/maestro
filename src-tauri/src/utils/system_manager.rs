@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::api::events::AppEvent;
 use crate::config::{get_config, Config};
 use std::fs;
 use std::path::PathBuf;
@@ -81,7 +82,7 @@ pub fn handle_enable_autostart(app_handle: AppHandle) {
         toggle_startup(true).unwrap();
     }
 
-    app_handle.listen("config_changed", move |event| {
+    app_handle.listen(AppEvent::ConfigChange.as_str(), move |event| {
         if let Ok(config) = serde_json::from_str::<Config>(event.payload()) {
             if config.system.autostart {
                 toggle_startup(true).unwrap();
@@ -117,7 +118,7 @@ pub fn handle_debug_console(app_handle: AppHandle) {
         set_debug_console(config);
     }
 
-    app_handle.listen("config_changed", move |event| {
+    app_handle.listen(AppEvent::ConfigChange.as_str(), move |event| {
         if let Ok(config) = serde_json::from_str::<Config>(event.payload()) {
             unsafe {
                 set_debug_console(config);

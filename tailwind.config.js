@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  prefix: "",
-  theme: {
-    themes: ["light", "dark"],
-  },
-  plugins: [require("tailwindcss-animate"), require("daisyui")],
+export const darkMode = ["class"];
+export const content = ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"];
+export const plugins = [require("tailwindcss-animate"), require("daisyui")];
+export const daisyui = {
+  themes: ["light", "dark", "synthwave", "cyberpunk", "aqua", "coffee", "night"],
 };

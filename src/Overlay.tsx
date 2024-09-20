@@ -21,6 +21,14 @@ const VolumeOverlay = () => {
       setSession(session);
     });
 
+    invokeCommand(Command.GetConfig).then((config) => {
+      document.documentElement.setAttribute("data-theme", config.system.theme);
+    });
+
+    listenToEvent(AppEvent.ThemeChange, (theme) => {
+      document.documentElement.setAttribute("data-theme", theme);
+    });
+
     const initWindow = async () => {
       let window = getCurrentWindow();
       let monitor = await currentMonitor();
@@ -113,7 +121,7 @@ const VolumeOverlay = () => {
     >
       <div className="flex items-center gap-0 m-2 rounded-md justify-center">
         <div className="flex flex-row items-center gap-2">
-          <SessionButton name={sessionName} icon={icon} volume={volume} mute={mute} style="hover:bg-yellow-400" />
+          <SessionButton name={sessionName} icon={icon} volume={volume} mute={mute} hoverStyle="bg-base-100" />
           <input
             type="range"
             min={0}

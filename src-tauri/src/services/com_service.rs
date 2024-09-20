@@ -10,7 +10,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::{api::events, config};
+use crate::{
+    api::events::{self, AppEvent},
+    config,
+};
 use tauri::{AppHandle, Listener};
 
 use super::volume_service;
@@ -84,7 +87,7 @@ pub fn listen_serial_input(app_handle: AppHandle) -> () {
 
         let (tx, rx) = channel();
 
-        app_handle_clone.listen("config_changed", move |_| {
+        app_handle_clone.listen(AppEvent::ConfigChange.as_str(), move |_| {
             log::info!("Config changed, resetting serial input listener");
             let _ = tx.send(ThreadCommand::Reset);
         });

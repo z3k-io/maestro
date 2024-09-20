@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ThemePicker from "./components/ThemePicker";
 import "./styles.css";
 import { Config } from "./types/config";
 import { Command, invokeCommand } from "./utils/commands";
@@ -18,6 +19,8 @@ const Settings = () => {
     logger.warn(`Loaded config: ${JSON.stringify(config)}`);
     setConfig(config);
     setOriginalConfig(config);
+    let theme = config!.system.theme;
+    document.documentElement.setAttribute("data-theme", theme);
   };
 
   const setWindowSizeAndPosition = async () => {
@@ -30,7 +33,7 @@ const Settings = () => {
     const screenHeight = monitor!.size.height;
 
     const windowWidth = Math.round(600 * scaleFactor);
-    const windowHeight = Math.round(800 * scaleFactor);
+    const windowHeight = Math.round(875 * scaleFactor);
     let taskbarHeight = (await invokeCommand(Command.GetTaskbarHeight)) * scaleFactor;
 
     logger.debug(`Setting window size: ${windowWidth} ${windowHeight}`);
@@ -83,7 +86,8 @@ const Settings = () => {
     });
   }, []);
 
-  const handleSystemChange = useCallback((field: keyof Config["system"], value: boolean) => {
+  const handleSystemChange = useCallback((field: keyof Config["system"], value: string | boolean) => {
+    logger.debug(`Setting ${field} to ${value}`);
     setConfig((prevConfig) => {
       if (!prevConfig) return prevConfig;
       return { ...prevConfig, system: { ...prevConfig.system, [field]: value } };
@@ -95,7 +99,7 @@ const Settings = () => {
   };
 
   const handleSave = async () => {
-    logger.warn(`Saving config: ${JSON.stringify(config)}`);
+    logger.debug(`Saving config: ${JSON.stringify(config)}`);
     await invokeCommand(Command.SetConfig, { config: config! });
 
     toast.success("Settings saved", {
@@ -111,7 +115,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-base-300 h-screen w-screen">
+    <div className="flex flex-col gap-4 p-4 bg-base-300 h-full w-full">
       <div className="flex flex-row justify-between">
         <h1 className="text-3xl font-bold text-center p-2">Settings</h1>
         <div className="flex flex-row gap-2">
@@ -171,6 +175,7 @@ const Settings = () => {
           />
         </div>
       </div>
+
       <div id="arduino" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
         <h2 className="text-xl font-bold text-left">Serial Connection (Arduino)</h2>
         <label className="form-control w-full max-w-xs">
@@ -224,6 +229,7 @@ const Settings = () => {
             />
           </label>
         </div>
+        <ThemePicker theme={config?.system.theme || "light"} setTheme={(newTheme) => handleSystemChange("theme", newTheme)} />
       </div>
     </div>
   );

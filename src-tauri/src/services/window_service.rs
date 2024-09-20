@@ -3,7 +3,7 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
-use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use windows::Win32::{
     Foundation::RECT,
     UI::WindowsAndMessaging::{GetSystemMetrics, SystemParametersInfoA, SM_CYSCREEN, SPI_GETWORKAREA, SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS},
@@ -57,7 +57,7 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
                         if window_clone.is_visible().unwrap() {
                             log::debug!("Window focus lost -> closing");
                             window_clone.hide().unwrap();
-                            app_handle.emit("window_hidden", ()).unwrap();
+                            events::emit_window_hidden_event(app_handle.clone());
                         }
                     });
                 }
@@ -75,7 +75,7 @@ pub fn create_settings(app: AppHandle) -> WebviewWindow {
         .decorations(true)
         .resizable(true)
         .focused(true)
-        .always_on_top(true)
+        .always_on_top(false)
         .skip_taskbar(false)
         .visible(false)
         .build()
