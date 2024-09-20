@@ -1,7 +1,7 @@
 {
   "name": "mix-monkey",
   "private": true,
-  "version": "0.5.9",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "start": "tauri dev",
-    "release": "node scripts/update-version.js"
+    "release": "node scripts/update-version.js",
+    "version": "node scripts/update-version.js"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0-rc.5",
