@@ -18,4 +18,4 @@ mixer:
 system:
   autostart: true
   show_console: false
-  theme: coffee
+  theme: dark

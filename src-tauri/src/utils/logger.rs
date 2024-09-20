@@ -1,6 +1,6 @@
 use flexi_logger::{DeferredNow, Duplicate, FileSpec, Logger, WriteMode};
 use log::Record;
-use std::{io::Write, process::Command};
+use std::{fs, io::Write, path::Path, process::Command};
 
 pub fn init() {
     let format = |write: &mut dyn Write, now: &mut DeferredNow, record: &Record| {
@@ -34,6 +34,39 @@ pub fn init() {
         .duplicate_to_stdout(Duplicate::All)
         .start()
         .unwrap();
+
+    delete_old_log_files(3);
+}
+
+fn delete_old_log_files(keep: usize) {
+    let logs_dir = Path::new("logs");
+    if !logs_dir.exists() {
+        return;
+    }
+
+    let mut log_files: Vec<_> = fs::read_dir(logs_dir)
+        .unwrap()
+        .filter_map(|entry| {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("txt") {
+                Some((entry.metadata().unwrap().modified().unwrap(), path))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    if log_files.len() <= keep {
+        return;
+    }
+
+    log_files.sort_by(|a, b| b.0.cmp(&a.0));
+
+    for (_, path) in log_files.into_iter().skip(keep) {
+        log::debug!("Deleting old log file: {}", path.display());
+        fs::remove_file(path).unwrap();
+    }
 }
 
 pub fn open_log_file() {
