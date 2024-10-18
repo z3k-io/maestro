@@ -57,13 +57,12 @@ pub fn get_sessions(session_name: &str) -> Vec<AudioSession> {
 }
 
 pub fn set_session_volume(session_name: &str, volume: i32) -> Option<AudioSession> {
+    let mut volume = volume;
     if volume < 0 {
-        log::error!("Volume must be between 0 and 100");
-        return None;
+        volume = 0;
     }
     if volume > 100 {
-        log::error!("Volume must be between 0 and 100");
-        return None;
+        volume = 100;
     }
 
     let new_volume = volume as f32 / 100.0;
