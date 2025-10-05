@@ -7,8 +7,6 @@ mod tray {
     pub mod system_tray;
 }
 mod utils {
-    pub mod key;
-    pub mod key_listener;
     pub mod logger;
     pub mod macro_listener;
     pub mod system_manager;
