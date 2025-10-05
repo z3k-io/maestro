@@ -14,8 +14,8 @@ sessions:
     keybinds: ~
 mixer:
   enabled: true
-  hotkey: LCtrl + LShift + M
+  hotkey: Ctrl + Shift + M
 system:
   autostart: true
-  show_console: false
-  theme: dark
+  show_console: true
+  theme: night

@@ -1,4 +1,3 @@
-use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::{config::Config, models::audio_session::AudioSession, services::window_service};
@@ -10,17 +9,6 @@ pub enum AppEvent {
     ConfigChange,
     ThemeChange,
     WindowHidden,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct VolumeChangePayload {
-    pub session_name: String,
-    pub volume: f32,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MixerVisibilityPayload {
-    pub visible: bool,
 }
 
 impl AppEvent {

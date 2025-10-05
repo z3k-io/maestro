@@ -117,6 +117,7 @@ unsafe extern "system" fn keyboard_hook(code: i32, w_param: WPARAM, l_param: LPA
     // Always call the next hook in the chain, regardless of whether we've handled the event
     CallNextHookEx(None, code, w_param, l_param)
 }
+
 pub struct KeyListener {
     hook: SendableHHOOK,
 }

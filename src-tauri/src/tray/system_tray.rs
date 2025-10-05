@@ -33,7 +33,7 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
         .tooltip("Mix Monkey 🍌")
         .icon(image)
         .menu(&menu)
-        .menu_on_left_click(false)
+        .show_menu_on_left_click(false)
         .on_menu_event(move |app, event| match event.id.as_ref() {
             "show_logs" => {
                 log::info!("Opening logs");
