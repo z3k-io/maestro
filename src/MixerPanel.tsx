@@ -39,7 +39,7 @@ const VolumeMixerPanel = () => {
 
   const fetchConfig = async () => {
     const config = await invokeCommand(Command.GetConfig);
-    logger.warn(`Loaded config: ${JSON.stringify(config)}`);
+    logger.debug(`Loaded config: ${JSON.stringify(config)}`);
     let theme = config!.system.theme;
     document.documentElement.setAttribute("data-theme", theme);
   };

@@ -2,7 +2,7 @@
 
 Welcome to Mix Monkey, the definitive replacement for Windows audio controls!
 
-[![Build and Release](https://github.com/zmconnelly/mix-monkey/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/zmconnelly/mix-monkey/actions/workflows/release.yaml)
+[![Build and Release](https://github.com/z3k-io/mix-monkey/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/z3k-io/mix-monkey/actions/workflows/release.yaml)
 
 ## Features
 

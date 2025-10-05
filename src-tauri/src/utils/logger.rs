@@ -75,6 +75,7 @@ pub fn open_log_file() {
 
 pub fn log(message: String, level: &str) {
     match level {
+        "trace" => log::trace!("UI: {}", message),
         "debug" => log::debug!("UI: {}", message),
         "info" => log::info!("UI: {}", message),
         "warn" => log::warn!("UI: {}", message),

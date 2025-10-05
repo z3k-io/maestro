@@ -94,14 +94,12 @@ fn register_key_listeners(app_handle: AppHandle, key_listener: &KeyListener, con
 }
 
 fn handle_session_toggle_mute(session_name: &str, app_handle: AppHandle) {
-    log::info!("Session toggle mute: {}", session_name);
     let session = volume_service::toggle_session_mute(session_name);
 
     events::emit_volume_change_event(&session, app_handle);
 }
 
 fn handle_session_up(session_name: &str, app_handle: AppHandle) {
-    log::info!("Session up: {}", session_name);
     let current_vol = volume_service::get_session_volume(session_name);
     let session = volume_service::set_session_volume(session_name, current_vol + 2).unwrap();
 
@@ -109,7 +107,6 @@ fn handle_session_up(session_name: &str, app_handle: AppHandle) {
 }
 
 fn handle_session_down(session_name: &str, app_handle: AppHandle) {
-    log::info!("Session down: {}", session_name);
     let current_vol = volume_service::get_session_volume(session_name);
     let session = volume_service::set_session_volume(session_name, current_vol - 2).unwrap();
 

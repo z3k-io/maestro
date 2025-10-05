@@ -14,4 +14,4 @@ mixer:
 system:
   autostart: true
   show_console: true
-  theme: night
+  theme: dark

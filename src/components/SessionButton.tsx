@@ -30,7 +30,7 @@ export default function SessionButton({ name, icon, volume, mute, hoverStyle = "
       <span
         className={`absolute inset-0 -m-1 ${hoverStyle} opacity-0 group-hover:opacity-100 rounded-lg transition-opacity duration-200`}
       ></span>
-      <img src={icon} className="h-6 w-6 relative z-10" />
+      {icon && <img src={icon} className="h-6 w-6 relative z-10" />}
       <SpeakerIcon volume={volume} mute={mute} className="h-5 w-5 relative z-10" />
     </button>
   );
