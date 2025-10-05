@@ -79,12 +79,6 @@ const Settings = () => {
     });
   }, []);
 
-  const handleArduinoChange = useCallback((field: keyof Config["arduino"], value: string | boolean) => {
-    setConfig((prevConfig) => {
-      if (!prevConfig) return prevConfig;
-      return { ...prevConfig, arduino: { ...prevConfig.arduino, [field]: value } };
-    });
-  }, []);
 
   const handleSystemChange = useCallback((field: keyof Config["system"], value: string | boolean) => {
     logger.debug(`Setting ${field} to ${value}`);
@@ -176,36 +170,6 @@ const Settings = () => {
         </div>
       </div>
 
-      <div id="arduino" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
-        <h2 className="text-xl font-bold text-left">Serial Connection (Arduino)</h2>
-        <label className="form-control w-full max-w-xs">
-          <div className="flex flex-col">
-            <div className="form-control w-52">
-              <label className="label cursor-pointer">
-                <span className="label-text">Enabled</span>
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={config?.arduino.enabled}
-                  onChange={(e) => handleArduinoChange("enabled", e.target.checked)}
-                />
-              </label>
-            </div>
-            <div className="flex flex-row gap-2">
-              <label className="label">
-                <span className="label-text whitespace-nowrap">COM Port</span>
-              </label>
-              <input
-                type="text"
-                placeholder="COM3"
-                className="input input-sm input-bordered w-full max-w-xs"
-                value={config?.arduino.com_port}
-                onChange={(e) => handleArduinoChange("com_port", e.target.value)}
-              />
-            </div>
-          </div>
-        </label>
-      </div>
 
       <div id="system" className="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
         <h2 className="text-xl font-bold text-left">System Settings</h2>

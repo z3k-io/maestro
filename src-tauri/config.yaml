@@ -1,8 +1,4 @@
 ---
-arduino:
-  enabled: true
-  com_port: COM3
-  baud_rate: 9600
 sessions:
   - name: master
     keybinds: ~

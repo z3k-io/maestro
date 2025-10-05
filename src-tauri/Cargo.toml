@@ -16,7 +16,6 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-shell = "2"
 tauri-plugin-autostart = "2"
-tauri-plugin-global-shortcut = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.9"
@@ -27,8 +26,6 @@ once_cell = "1.21"
 windows-volume-control = { git = "https://github.com/z3k-io/windows-volume-control.git", branch = "main" }
 windows-key-listener = "0.2"
 windows-icons = "0.3"
-serialport = "4.7"
-winreg = "0.55"
 dirs = "6.0"
 windows = { version = "0.62", features = [
     "Win32_Foundation",

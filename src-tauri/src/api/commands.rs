@@ -52,3 +52,29 @@ pub fn get_config() -> Config {
 pub fn set_config(config: Config, app_handle: AppHandle) {
     config::set_config(config, &app_handle);
 }
+
+#[tauri::command]
+pub fn enable_autostart(app_handle: AppHandle) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    
+    let autostart_manager = app_handle.autolaunch();
+    autostart_manager.enable().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn disable_autostart(app_handle: AppHandle) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    
+    let autostart_manager = app_handle.autolaunch();
+    autostart_manager.disable().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn is_autostart_enabled(app_handle: AppHandle) -> Result<bool, String> {
+    use tauri_plugin_autostart::ManagerExt;
+    
+    let autostart_manager = app_handle.autolaunch();
+    autostart_manager.is_enabled().map_err(|e| e.to_string())
+}

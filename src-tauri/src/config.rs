@@ -10,12 +10,6 @@ use yaml_rust::{Yaml, YamlEmitter, YamlLoader};
 
 use crate::api::events::emit_config_change_event;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ArduinoConfig {
-    pub enabled: bool,
-    pub com_port: String,
-    pub baud_rate: u32,
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KeybindConfig {
@@ -44,7 +38,6 @@ pub struct SessionConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
-    pub arduino: ArduinoConfig,
     pub sessions: Vec<SessionConfig>,
     pub mixer: MixerConfig,
     pub system: SystemConfig,
@@ -137,7 +130,6 @@ fn yaml_to_value(yaml: &Yaml) -> serde_yaml::Value {
 
 fn update_yaml_from_config(yaml: &mut Yaml, config: &Config) {
     if let Yaml::Hash(ref mut hash) = *yaml {
-        update_yaml_field(hash, "arduino", &config.arduino);
         update_yaml_field(hash, "sessions", &config.sessions);
         update_yaml_field(hash, "mixer", &config.mixer);
         update_yaml_field(hash, "system", &config.system);

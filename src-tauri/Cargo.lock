@@ -873,16 +873,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "errno"
-version = "0.3.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
-dependencies = [
- "libc",
- "windows-sys 0.61.1",
-]
-
-[[package]]
 name = "exr"
 version = "1.73.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1208,16 +1198,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gethostname"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc257fdb4038301ce4b9cd1b3b51704509692bb3ff716a410cbd07925d9dae55"
-dependencies = [
- "rustix",
- "windows-targets 0.52.6",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1351,24 +1331,6 @@ name = "glob"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
-
-[[package]]
-name = "global-hotkey"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9247516746aa8e53411a0db9b62b0e24efbcf6a76e0ba73e5a91b512ddabed7"
-dependencies = [
- "crossbeam-channel",
- "keyboard-types",
- "objc2 0.6.3",
- "objc2-app-kit",
- "once_cell",
- "serde",
- "thiserror 2.0.17",
- "windows-sys 0.59.0",
- "x11rb",
- "xkeysym",
-]
 
 [[package]]
 name = "gobject-sys"
@@ -1801,16 +1763,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "io-kit-sys"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "617ee6cf8e3f66f3b4ea67a4058564628cde41901316e19f559e14c7c72c5e7b"
-dependencies = [
- "core-foundation-sys",
- "mach2",
-]
-
-[[package]]
 name = "io-uring"
 version = "0.7.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2054,36 +2006,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "libudev"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78b324152da65df7bb95acfcaab55e3097ceaab02fb19b228a9eb74d55f135e0"
-dependencies = [
- "libc",
- "libudev-sys",
-]
-
-[[package]]
-name = "libudev-sys"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c8469b4a23b962c1396b9b451dda50ef5b283e8dd309d69033475fa9b334324"
-dependencies = [
- "libc",
- "pkg-config",
-]
-
-[[package]]
 name = "linked-hash-map"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
-
-[[package]]
-name = "linux-raw-sys"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df1d3c3b53da64cf5760482273a98e575c651a67eec7f77df96b5b642de8f039"
 
 [[package]]
 name = "litemap"
@@ -2120,15 +2046,6 @@ name = "mac"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c41e0c4fef86961ac6d6f8a82609f55f31b05e4fce149ac5710e439df7619ba4"
-
-[[package]]
-name = "mach2"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d640282b302c0bb0a2a8e0233ead9035e3bed871f0b7e81fe4a1ec829765db44"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "markup5ever"
@@ -2230,17 +2147,14 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
- "serialport",
  "tauri",
  "tauri-build",
  "tauri-plugin-autostart",
- "tauri-plugin-global-shortcut",
  "tauri-plugin-shell",
  "windows 0.62.1",
  "windows-icons",
  "windows-key-listener",
  "windows-volume-control",
- "winreg 0.55.0",
  "yaml-rust",
 ]
 
@@ -2310,17 +2224,6 @@ name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
-
-[[package]]
-name = "nix"
-version = "0.26.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "598beaf3cc6fdd9a5dfb1630c2800c7acd31df7aaf0f565796fba2b53ca1af1b"
-dependencies = [
- "bitflags 1.3.2",
- "cfg-if",
- "libc",
-]
 
 [[package]]
 name = "nodrop"
@@ -3454,19 +3357,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustix"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd15f8a2c5551a84d56efdc1cd049089e409ac19a3072d5037a17fd70719ff3e"
-dependencies = [
- "bitflags 2.9.4",
- "errno",
- "libc",
- "linux-raw-sys",
- "windows-sys 0.61.1",
-]
-
-[[package]]
 name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3743,25 +3633,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
-]
-
-[[package]]
-name = "serialport"
-version = "4.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2acaf3f973e8616d7ceac415f53fc60e190b2a686fbcf8d27d0256c741c5007b"
-dependencies = [
- "bitflags 2.9.4",
- "cfg-if",
- "core-foundation",
- "core-foundation-sys",
- "io-kit-sys",
- "libudev",
- "mach2",
- "nix",
- "scopeguard",
- "unescaper",
- "winapi",
 ]
 
 [[package]]
@@ -4237,21 +4108,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauri-plugin-global-shortcut"
-version = "2.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6df9f0f7bf2fe768b85fee4951c2505a35b72c44df1f6403e74e110bc13c5f58"
-dependencies = [
- "global-hotkey",
- "log",
- "serde",
- "serde_json",
- "tauri",
- "tauri-plugin",
- "thiserror 2.0.17",
-]
-
-[[package]]
 name = "tauri-plugin-shell"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4707,15 +4563,6 @@ name = "typenum"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "562d481066bde0658276a35467c4af00bdc6ee726305698a55b86e61d7ad82bb"
-
-[[package]]
-name = "unescaper"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c01d12e3a56a4432a8b436f293c25f4808bdf9e9f9f98f9260bba1f1bc5a1f26"
-dependencies = [
- "thiserror 2.0.17",
-]
 
 [[package]]
 name = "unic-char-property"
@@ -5866,29 +5713,6 @@ dependencies = [
  "once_cell",
  "pkg-config",
 ]
-
-[[package]]
-name = "x11rb"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9993aa5be5a26815fe2c3eacfc1fde061fc1a1f094bf1ad2a18bf9c495dd7414"
-dependencies = [
- "gethostname",
- "rustix",
- "x11rb-protocol",
-]
-
-[[package]]
-name = "x11rb-protocol"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
-
-[[package]]
-name = "xkeysym"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9cc00251562a284751c9973bace760d86c0276c471b4be569fe6b068ee97a56"
 
 [[package]]
 name = "yaml-rust"
