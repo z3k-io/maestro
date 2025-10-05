@@ -1,7 +1,7 @@
 {
-  "productName": "mix-monkey",
+  "productName": "volare",
   "version": "1.0.1",
-  "identifier": "com.mix-monkey.app",
+  "identifier": "com.volare.app",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",

@@ -8,7 +8,7 @@ fn main() {
         log::error!("Panic occurred: {:?}", panic_info);
     }));
 
-    if let Err(e) = std::panic::catch_unwind(|| mix_monkey_lib::run()) {
+    if let Err(e) = std::panic::catch_unwind(|| volare_lib::run()) {
         log::error!("Application crashed: {:?}", e);
     }
 }

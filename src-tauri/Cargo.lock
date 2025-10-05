@@ -2137,28 +2137,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mix-monkey"
-version = "1.0.1"
-dependencies = [
- "dirs 6.0.0",
- "flexi_logger",
- "log",
- "once_cell",
- "serde",
- "serde_json",
- "serde_yaml",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-shell",
- "windows 0.62.1",
- "windows-icons",
- "windows-key-listener",
- "windows-volume-control",
- "yaml-rust",
-]
-
-[[package]]
 name = "moxcms"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4693,6 +4671,28 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "volare"
+version = "1.1.0"
+dependencies = [
+ "dirs 6.0.0",
+ "flexi_logger",
+ "log",
+ "once_cell",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-shell",
+ "windows 0.62.1",
+ "windows-icons",
+ "windows-key-listener",
+ "windows-volume-control",
+ "yaml-rust",
+]
 
 [[package]]
 name = "vswhom"

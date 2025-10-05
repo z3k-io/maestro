@@ -1,8 +1,8 @@
-# Mix Monkey
+# Volare
 
-Welcome to Mix Monkey, the definitive replacement for Windows audio controls!
+Welcome to Volare, the definitive replacement for Windows audio controls!
 
-[![Build and Release](https://github.com/z3k-io/mix-monkey/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/z3k-io/mix-monkey/actions/workflows/release.yaml)
+[![Build and Release](https://github.com/z3k-io/volare/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/z3k-io/volare/actions/workflows/release.yaml)
 
 ## Features
 
@@ -11,13 +11,6 @@ Welcome to Mix Monkey, the definitive replacement for Windows audio controls!
 - Individually control application volumes, i.e. Chrome / Firefox, Discord, Games, etc.
 - First class support for hardware controllers including custom keyboards and Arduinos.
 
-## Setup
-
-Build yourself an audio box with rotary encoders [TK]  
-Download and flash the [Arduino Sketch](/arduino/sketch/sketch.ino) to your microcontroller.  
-Download and install the latest release  
-Download config file [config.yaml](/src-tauri/config.yaml) and modify for your usecase.  
-Run the app and turn the dials.
 
 ## Contribution
 
@@ -25,7 +18,7 @@ Contributions are welcome, create an Issue or open a Merge Request.
 
 ### Implementation
 
-Mix Monkey is built with [Tauri](https://tauri.app/). It runs a Rust application as a background process which listens for volume change events over a COM port. It processes serial data and interfaces with the Windows API to change program volume status according to user supplied configs. It also controls an overlay window that serves to replace the basic volume change UI Microsoft provides. This window is actually a webpage built and styled with [React](https://react.dev/) and [Tailwind](https://tailwindcss.com/) that is then run in a headless window using the OS provided [WebView2 Runtime](https://learn.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH).
+Volare is built with [Tauri](https://tauri.app/). It runs a Rust application as a background process which listens for volume change events over a COM port. It processes serial data and interfaces with the Windows API to change program volume status according to user supplied configs. It also controls an overlay window that serves to replace the basic volume change UI Microsoft provides. This window is actually a webpage built and styled with [React](https://react.dev/) and [Tailwind](https://tailwindcss.com/) that is then run in a headless window using the OS provided [WebView2 Runtime](https://learn.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH).
 
 ### Developer Environment
 

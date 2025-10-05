@@ -44,11 +44,7 @@ pub fn handle_debug_console(app_handle: AppHandle) {
                 log::info!("Console not attached, attaching");
                 let result = AttachConsole(ATTACH_PARENT_PROCESS);
                 if result.is_err() {
-                    if let Err(e) = AllocConsole() {
-                        log::warn!("Failed to allocate console: {:?}", e);
-                    } else {
-                        log::info!("Console allocated successfully");
-                    }
+                    AllocConsole().expect("Failed to allocate console");
                 } else {
                     log::info!("Console attached successfully");
                 }
@@ -56,9 +52,7 @@ pub fn handle_debug_console(app_handle: AppHandle) {
                 log::info!("Console already attached");
             }
         } else {
-            if let Err(e) = FreeConsole() {
-                log::warn!("Failed to free console: {:?}", e);
-            }
+            FreeConsole().expect("Failed to free console");
         }
     }
 

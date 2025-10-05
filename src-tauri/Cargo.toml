@@ -1,12 +1,12 @@
 [package]
-name = "mix-monkey"
-version = "1.0.1"
+name = "volare"
+version = "1.1.0"
 description = "Windows Audio Manager"
 authors = ["z3k"]
 edition = "2021"
 
 [lib]
-name = "mix_monkey_lib"
+name = "volare_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]

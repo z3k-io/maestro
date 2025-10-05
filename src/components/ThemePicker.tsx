@@ -1,4 +1,4 @@
-const themes = ["light", "dark", "night", "synthwave", "aqua", "coffee"];
+const themes = ["light", "dark"];
 
 interface ThemePickerProps {
   theme: string;
