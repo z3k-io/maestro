@@ -1,6 +1,6 @@
 <template>
   <div id="container" class="flex flex-col h-screen w-screen bg-base-300 justify-center m-0 p-0">
-    <h1 class="text-md font-bold pb-2 px-4 m-0">Volume Mixer</h1>
+    <h1 class="text-md font-bold pb-2 px-4 m-0">Maestro</h1>
     <div class="flex flex-col gap-2">
       <VolumeControl 
         v-for="session in sessions" 

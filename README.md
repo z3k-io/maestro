@@ -1,35 +1,78 @@
-# Maestro
-
-Welcome to Maestro, the definitive replacement for Windows audio controls!
+# Maestro 🎵
 
 [![Build and Release](https://github.com/z3k-io/maestro/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/z3k-io/maestro/actions/workflows/release.yaml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://github.com/z3k-io/maestro)
 
-## Features
+---
+### Ditch Window's uninspired audio controls. 
 
-- Beautiful and ergonomic volume controls for Windows applications.
-- Replacement for the dry and dated Windows UI.
-- Individually control application volumes, i.e. Chrome / Firefox, Discord, Games, etc.
-- First class support for hardware controllers including custom keyboards and Arduinos.
+Maestro is a beautiful, modern audio mixer for Windows. Control individual application volumes with mappable key bindings.
+
+## ✨ Features
+
+- 🎨 **Beautiful UI** - Modern interface that replaces Windows' basic volume controls
+- 🔧 **Configurable** - Remap keybinds, change themes, and customize behavior
+- 🚀 **Lightweight** - Built with Tauri for optimal performance
+
+## 📦 Installation
+
+#### Download the [latest release](https://github.com/z3k-io/maestro/releases)
+
+#### Requirements
+- Windows 10/11
+- WebView2 Runtime (pre-installed with modern releases)
+
+## 🚀 Quick Start
+
+1. Download and install Maestro
+2. Runs at startup by default
+
+## 🛠️ Development
+
+### Architecture
+Built with [Tauri](https://tauri.app), Windows API integration, audio session management, and hardware communication managed in [Rust](https://rust-lang.org/). UI uses [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/), built with Vue.
+
+### Development Setup
+
+#### Requirements
+- **Rust** (1.8+)
+- **Bun** (or equivalent runtime)
+
+#### Getting Started
+```bash
+# Clone the repository
+git clone https://github.com/z3k-io/maestro.git
+
+# Install dependencies
+bun install
+
+# Start development server
+bun start
+
+# Build the executable
+bun run build
+```
+
+## 🤝 Contributing
+
+Contributions are welcome!
+- 🐛 **Report Bugs**: Open an issue with detailed reproduction steps
+- 💡 **Feature Requests**: Suggest new features or improvements
+- 🔧 **Code Contributions**: Submit pull requests for bug fixes or features
 
 
-## Contribution
-
-Contributions are welcome, create an Issue or open a Merge Request.
-
-### Implementation
-
-Maestro is built with [Tauri](https://tauri.app/). It runs a Rust application as a background process which listens for volume change events over a COM port. It processes serial data and interfaces with the Windows API to change program volume status according to user supplied configs. It also controls an overlay window that serves to replace the basic volume change UI Microsoft provides. This window is actually a webpage built and styled with [React](https://react.dev/) and [Tailwind](https://tailwindcss.com/) that is then run in a headless window using the OS provided [WebView2 Runtime](https://learn.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH).
-
-### Developer Environment
-
-    Requirements
-      - Rust (1.8+)
-      - NodeJS (22.5+)
+#### Future Plans
+- Hardware integrations
+- Automatic updates  
+- Multiple output devices
+- Input device support
 
 
-    Recommendations
-      - VSCode
-      - RustFMT
-      - Bun
+## 📄 License
 
-    To run in dev mode, simply run `bun start` from the project root.
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+**Made with ❤️ for Windows enthusiasts**

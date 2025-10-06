@@ -6,10 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
     "tauri": "tauri",
     "start": "tauri dev",
-    "release": "node scripts/update-version.js",
     "version": "node scripts/update-version.js"
   },
   "dependencies": {
