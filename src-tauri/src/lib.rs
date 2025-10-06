@@ -27,7 +27,7 @@ mod models {
 pub fn run() {
     logger::init();
 
-    log::info!("Volare v{}", env!("CARGO_PKG_VERSION"));
+    log::info!("Maestro v{}", env!("CARGO_PKG_VERSION"));
 
     tauri::Builder::default()
         .setup(|app| {

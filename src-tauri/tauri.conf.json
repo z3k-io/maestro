@@ -1,7 +1,7 @@
 {
-  "productName": "volare",
+  "productName": "maestro",
   "version": "1.0.1",
-  "identifier": "com.volare.app",
+  "identifier": "com.maestro.app",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",

@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "volare",
+      "name": "maestro",
       "dependencies": {
         "@tauri-apps/api": "^2.8.0",
         "@tauri-apps/plugin-autostart": "^2.5.0",

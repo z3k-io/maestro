@@ -30,7 +30,7 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
     let image = Image::from_path("icons/speaker-32.png").unwrap();
 
     let _ = TrayIconBuilder::with_id("tray")
-        .tooltip("Volare 🍌")
+        .tooltip("Maestro 🎻")
         .icon(image)
         .menu(&menu)
         .show_menu_on_left_click(false)
@@ -51,7 +51,7 @@ pub fn initialize_tray(app_handle: AppHandle<Wry>) {
                 window_service::show_settings(app.clone());
             }
             "quit" => {
-                log::info!("Quitting Volare");
+                log::info!("Quitting Maestro");
                 app.exit(0);
             }
             _ => {}

@@ -71,7 +71,7 @@ pub fn create_mixer(app: AppHandle) -> WebviewWindow {
 
 pub fn create_settings(app: AppHandle) -> WebviewWindow {
     let window = WebviewWindowBuilder::new(&app, "settings", WebviewUrl::App("index-settings.html".into()))
-        .title("Volare | Settings")
+        .title("Maestro | Settings")
         .decorations(true)
         .resizable(true)
         .focused(true)
