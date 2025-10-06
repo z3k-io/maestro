@@ -101,9 +101,12 @@ fn handle_session_toggle_mute(session_name: &str, app_handle: AppHandle) {
 
 fn handle_session_up(session_name: &str, app_handle: AppHandle) {
     let current_vol = volume_service::get_session_volume(session_name);
-    let session = volume_service::set_session_volume(session_name, current_vol + 2).unwrap();
-
-    events::emit_volume_change_event(&session, app_handle);
+    
+    volume_service::set_session_volume(session_name, current_vol + 2).unwrap();
+    volume_service::set_session_mute(session_name, false);
+    
+    let updated_session = volume_service::get_sessions(session_name).into_iter().next().unwrap();
+    events::emit_volume_change_event(&updated_session, app_handle);
 }
 
 fn handle_session_down(session_name: &str, app_handle: AppHandle) {

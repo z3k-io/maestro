@@ -34,6 +34,7 @@ pub fn set_session_volume(session_name: &str, volume: i32) -> AudioSession {
     return volume_service::set_session_volume(session_name, volume).expect("Failed to set volume.");
 }
 
+
 #[tauri::command]
 pub fn toggle_session_mute(app_handle: AppHandle, session_name: &str) -> bool {
     let session = volume_service::toggle_session_mute(session_name);
