@@ -48,10 +48,10 @@ git clone https://github.com/z3k-io/maestro.git
 bun install
 
 # Start development server
-bun start
+bun run start
 
 # Build the executable
-bun run build
+bun run tauri build
 ```
 
 ## 🤝 Contributing
