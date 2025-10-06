@@ -3,8 +3,8 @@ import fs from "fs";
 import readline from "readline";
 
 const packageJsonPath = "package.json";
-const tauriConfigPath = "src-tauri/tauri.conf.json";
 const cargoTomlPath = "src-tauri/Cargo.toml";
+const cargoLockPath = "src-tauri/Cargo.lock";
 
 const getLatestTag = () => {
   try {
@@ -49,15 +49,14 @@ const updateAppVersion = (type) => {
   packageJson.version = newVersion;
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-  // Update tauri.conf.json
-  const tauriConfig = JSON.parse(fs.readFileSync(tauriConfigPath, "utf8"));
-  tauriConfig.version = newVersion;
-  fs.writeFileSync(tauriConfigPath, JSON.stringify(tauriConfig, null, 2));
-
   // Update Cargo.toml
   let cargoToml = fs.readFileSync(cargoTomlPath, "utf8");
   cargoToml = cargoToml.replace(/version\s*=\s*"\d+\.\d+\.\d+"/, `version = "${newVersion}"`);
   fs.writeFileSync(cargoTomlPath, cargoToml);
+
+  let cargoLock = fs.readFileSync(cargoLockPath, "utf8");
+  cargoLock = cargoLock.replace(/version\s*=\s*"\d+\.\d+\.\d+"/, `version = "${newVersion}"`);
+  fs.writeFileSync(cargoLockPath, cargoLock);
 
   console.log(`✅ Version updated from ${currentVersion} to ${newVersion}`);
 
@@ -70,7 +69,7 @@ const updateAppVersion = (type) => {
     if (answer.toLowerCase() === "y" || answer.toLowerCase() === "yes") {
       try {
         console.log("Committing version changes...");
-        execSync(`git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml`);
+        execSync(`git add package.json src-tauri/Cargo.toml src-tauri/Cargo.lock`);
         execSync(`git commit -m "Bump version to ${newVersion}"`);
         
         console.log("Creating git tag...");
@@ -88,7 +87,7 @@ const updateAppVersion = (type) => {
     } else {
       console.log("Changes saved locally but not committed.");
       console.log("To release later, run:");
-      console.log(`  git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml`);
+      console.log(`  git add package.json src-tauri/Cargo.toml src-tauri/Cargo.lock`);
       console.log(`  git commit -m "Bump version to ${newVersion}"`);
       console.log(`  git tag -a v${newVersion} -m "Version ${newVersion}"`);
       console.log(`  git push origin main && git push origin --tags`);
