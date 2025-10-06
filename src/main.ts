@@ -1,6 +1,4 @@
 import { createApp } from 'vue';
-import Toast from 'vue-toastification';
-import 'vue-toastification/dist/index.css';
 import './styles.css';
 
 import MixerPanel from './MixerPanel.vue';
@@ -29,15 +27,6 @@ switch (windowType) {
     break;
   case 'settings':
     app = createApp(Settings);
-    app.use(Toast, {
-      position: "top-center",
-      timeout: 1500,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "dark",
-    });
     break;
   default:
     throw new Error('Invalid window type');

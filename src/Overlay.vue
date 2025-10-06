@@ -34,7 +34,6 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import SessionButton from "./components/SessionButton.vue";
-import "./styles.css";
 import type { AudioSession } from "./types/audioSession";
 import { Command, invokeCommand } from "./utils/commands";
 import { AppEvent, listenToEvent } from "./utils/events";

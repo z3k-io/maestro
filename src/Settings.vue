@@ -1,5 +1,12 @@
 <template>
   <div class="flex flex-col gap-4 p-4 bg-base-300 h-full w-full">
+    <!-- Toast container -->
+    <div class="toast toast-top toast-center" v-if="showToast">
+      <div class="alert alert-success">
+        <span>{{ toastMessage }}</span>
+      </div>
+    </div>
+    <!-- Header -->
     <div class="flex flex-row justify-between">
       <h1 class="text-3xl font-bold text-center p-2">Settings</h1>
       <div class="flex flex-row gap-2">
@@ -11,6 +18,7 @@
         </button>
       </div>
     </div>
+    <!-- Audio Mapping -->
     <div id="sessions" class="bg-base-100 p-4 rounded-lg">
       <h2 class="text-xl font-bold text-left">Audio Mapping</h2>
       <div id="sessions" class="flex flex-row gap-2 justify-between">
@@ -31,6 +39,7 @@
       </div>
     </div>
 
+    <!-- Volume Mixer -->
     <div id="mixer" class="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
       <h2 class="text-xl font-bold text-left">Volume Mixer</h2>
       <div class="form-control w-52">
@@ -44,6 +53,7 @@
           />
         </label>
       </div>
+      <!-- Hotkey -->
       <div class="flex flex-ro gap-2">
         <label class="label">
           <span class="label-text whitespace-nowrap">Hotkey</span>
@@ -58,6 +68,7 @@
       </div>
     </div>
 
+    <!-- System Settings -->
     <div id="system" class="flex flex-col gap-2 p-4 bg-base-100 rounded-lg">
       <h2 class="text-xl font-bold text-left">System Settings</h2>
       <div class="form-control w-52">
@@ -82,7 +93,7 @@
       </div>
       <ThemePicker 
         :theme="config?.system.theme || 'light'" 
-        :setTheme="(newTheme) => handleSystemChange('theme', newTheme)" 
+        :setTheme="(newTheme: string) => handleSystemChange('theme', newTheme)" 
       />
     </div>
   </div>
@@ -92,16 +103,15 @@
 import { ref, onMounted } from "vue";
 import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import { currentMonitor, getCurrentWindow } from "@tauri-apps/api/window";
-import { useToast } from "vue-toastification";
 import ThemePicker from "./components/ThemePicker.vue";
-import "./styles.css";
 import type { Config } from "./types/config";
 import { Command, invokeCommand } from "./utils/commands";
 import { logger } from "./utils/logger";
 
 const config = ref<Config>();
 const originalConfig = ref<Config>();
-const toast = useToast();
+const showToast = ref(false);
+const toastMessage = ref('');
 
 const loadConfig = async () => {
   const configData = await invokeCommand(Command.GetConfig);
@@ -173,15 +183,12 @@ const handleSave = async () => {
   logger.debug(`Saving config: ${JSON.stringify(config.value)}`);
   await invokeCommand(Command.SetConfig, { config: config.value! });
 
-  toast.success("Settings saved", {
-    position: "top-center",
-    timeout: 500,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    theme: "dark",
-  });
+  toastMessage.value = "Settings saved";
+  showToast.value = true;
+  
+  setTimeout(() => {
+    showToast.value = false;
+  }, 1000);
 };
 
 onMounted(async () => {

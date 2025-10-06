@@ -17,7 +17,6 @@
     "@tauri-apps/plugin-autostart": "^2.5.0",
     "@tauri-apps/plugin-shell": "^2.3.1",
     "vue": "^3.5.22",
-    "vue-toastification": "^2.0.0-rc.5",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7"
   },
